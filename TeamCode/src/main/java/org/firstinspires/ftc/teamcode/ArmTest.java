@@ -24,6 +24,7 @@ public class ArmTest extends LinearOpMode {
 
 
             armMotor.setTargetPosition((int)angle);
+            
         }
     }
 }
