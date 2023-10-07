@@ -23,25 +23,29 @@ public class BasicControls extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
 
-            double axial    = -gamepad1.left_stick_y;
-            double lateral  = gamepad1.left_stick_x;
-            double yaw      = gamepad1.right_stick_x;
+            double axial = -gamepad1.left_stick_y;
+            double lateral = gamepad1.left_stick_x;
+            double yaw = gamepad1.right_stick_x;
 
-            double leftFrontPower   = axial + lateral + yaw;
-            double rightFrontPower  = axial - lateral - yaw;
-            double leftBackPower    = axial - lateral + yaw;
-            double rightBackPower   = axial + lateral - yaw;
+            double leftFrontPower = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower = axial - lateral + yaw;
+            double rightBackPower = axial + lateral - yaw;
 
             // max power of any motor, either direction
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            if (max > 1.0) {
-                leftFrontPower  /= max;
-                rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
+            double powerLimit = 0.75;
+            if (gamepad1.right_bumper)
+                powerLimit = 1.0;
+
+            if (max > powerLimit) {
+                leftFrontPower *= powerLimit / max;
+                rightFrontPower *= powerLimit / max;
+                leftBackPower *= powerLimit / max;
+                rightBackPower *= powerLimit / max;
             }
 
             leftFrontDrive.setPower(leftFrontPower);
