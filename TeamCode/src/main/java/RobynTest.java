@@ -24,6 +24,5 @@ public class RobynTest extends LinearOpMode {
                     leftFrontDrive.setPosition(leftFrontPower);
                 }
             }
-        }
     }
 }
