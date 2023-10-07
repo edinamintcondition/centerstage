@@ -9,22 +9,25 @@ public class ArmTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         DcMotor armMotor = hardwareMap.get(DcMotor.class, "front_left_motor");
-        armMotor.setTargetPosition(armMotor.getCurrentPosition());
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
         waitForStart();
+
+        armMotor.setTargetPosition(armMotor.getCurrentPosition());
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(0.1);
 
         while (opModeIsActive()) {
             double max;
 
-            double angle  = gamepad1.right_stick_y * 20;
+            double angle = gamepad1.right_stick_y * 20;
             telemetry.addData("angle", angle);
             telemetry.update();
 
 
+            armMotor.setTargetPosition((int) angle);
 
-            armMotor.setTargetPosition((int)angle);
-            
+
         }
     }
 }
