@@ -15,7 +15,7 @@ public class ArmTest extends LinearOpMode {
 
         armMotor.setTargetPosition(armMotor.getCurrentPosition());
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(0.1);
+        armMotor.setPower(0.6);
 
         while (opModeIsActive()) {
             double max;
