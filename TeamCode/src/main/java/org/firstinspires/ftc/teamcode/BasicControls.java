@@ -38,7 +38,7 @@ public class BasicControls extends LinearOpMode {
             max = Math.max(max, Math.abs(leftBackPower));
             max = Math.max(max, Math.abs(rightBackPower));
 
-            double powerLimit = 0.50;
+            double powerLimit = 0.60;
             if (gamepad1.right_bumper)
                 powerLimit = 1.0;
 
