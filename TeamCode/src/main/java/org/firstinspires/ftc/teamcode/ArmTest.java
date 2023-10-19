@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class ArmTest extends LinearOpMode {
     @Override
     public void runOpMode() {
-        DcMotor armMotor = hardwareMap.get(DcMotor.class, "front_left_motor");
+        DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
 
 
         waitForStart();
