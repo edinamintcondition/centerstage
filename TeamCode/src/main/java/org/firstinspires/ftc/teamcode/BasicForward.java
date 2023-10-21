@@ -1,10 +1,11 @@
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp
-public class BasicControls extends LinearOpMode {
+public class BasicForward extends LinearOpMode {
     @Override
     public void runOpMode() {
         DcMotor leftFrontDrive = hardwareMap.get(DcMotor.class, "front_left_motor");
@@ -20,28 +21,10 @@ public class BasicControls extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            double max;
-
-            double axial    = -gamepad1.left_stick_y;
-            double lateral  = gamepad1.left_stick_x;
-            double yaw      = gamepad1.right_stick_x;
-
-            double leftFrontPower   = axial + lateral + yaw;
-            double rightFrontPower  = axial - lateral - yaw;
-            double leftBackPower    = axial - lateral + yaw;
-            double rightBackPower   = axial + lateral - yaw;
-
-            // max power of any motor, either direction
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-
-            if (max > 1.0) {
-                leftFrontPower  /= max;
-                rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
-            }
+            int leftFrontPower = 1;
+            int leftBackPower = 1;
+            int rightFrontPower = 1;
+            int rightBackPower = 1;
 
             leftFrontDrive.setPower(leftFrontPower);
             leftBackDrive.setPower(leftBackPower);
