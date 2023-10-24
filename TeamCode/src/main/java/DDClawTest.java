@@ -1,33 +1,64 @@
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
+import static java.util.Arrays.asList;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
-import parts.MintMotor;
-import parts.MintServo;
+import java.util.Collections;
+
+import parts.MintArm;
+import parts.MintCamera;
+import parts.MintWheels;
+import parts.MintGrabber;
+import parts.MintWrist;
 
 @TeleOp
 public class DDClawTest extends LinearOpMode {
+
     @Override
     public void runOpMode() {
-        MintServo mintServo = new MintServo(hardwareMap);
-        MintMotor mintMotor = new MintMotor(hardwareMap);
+        //Gamepad 1
+        MintWheels wheels = new MintWheels(hardwareMap, gamepad1, telemetry);
 
-        String button = "heppe";
+        //Gamepad 2
+        MintArm arm = new MintArm(hardwareMap, gamepad2, telemetry);
+        MintWrist wrist = new MintWrist(hardwareMap, gamepad2, telemetry);
+        MintGrabber grabber = new MintGrabber(hardwareMap, gamepad2, telemetry);
+
+        //Camera
+        MintCamera camera  = new MintCamera(hardwareMap,  telemetry);
+
+        //Start OpMode
         waitForStart();
 
         telemetry.addData(">", "Starting Program");
-        mintServo.printPosition(telemetry);
+        grabber.printPosition();
         telemetry.update();
 
+        //Run stuff
         while (opModeIsActive()) {
-            mintMotor.control(gamepad2);
+            wheels.run();
+            arm.run();
 
-            button = mintServo.control(gamepad2);
+            wrist.run();
 
-            telemetry.addData(">", button + " is pressed :D");
-            mintServo.printPosition(telemetry);
+            grabber.run();
+            grabber.printPosition();
+
+            camera.run();
+
             telemetry.update();
+
+            // Save CPU resources; can resume streaming when needed.
+            if (gamepad2.dpad_down) {
+                camera.stopStreaming();
+            } else if (gamepad2.dpad_up) {
+                camera.resumeStreaming();
+            }
+
+            sleep(20);
         }
     }
 }
