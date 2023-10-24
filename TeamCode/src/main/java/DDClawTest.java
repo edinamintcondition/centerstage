@@ -1,36 +1,67 @@
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
+import static java.util.Arrays.asList;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+
+import java.util.Collections;
+
+import parts.MintArm;
+import parts.MintCamera;
+import parts.MintWheels;
+import parts.MintGrabber;
+import parts.MintWrist;
 
 @TeleOp
 public class DDClawTest extends LinearOpMode {
+
     @Override
     public void runOpMode() {
+        //Gamepad 1
+        MintWheels wheels = new MintWheels(hardwareMap, gamepad1, telemetry);
+
+        //Gamepad 2
+        MintArm arm = new MintArm(hardwareMap, gamepad2, telemetry);
+        MintWrist wrist = new MintWrist(hardwareMap, gamepad2, telemetry);
+        MintGrabber grabber = new MintGrabber(hardwareMap, gamepad2, telemetry);
+
+        //Camera
+        MintCamera camera  = new MintCamera(hardwareMap,  telemetry);
+
+        //Start OpMode
         waitForStart();
-        DcMotor motorTest = hardwareMap.get(DcMotor.class, "front_left_motor");
-        Servo testServo = hardwareMap.get(Servo.class, "test_servo");
 
         telemetry.addData(">", "Starting Program");
+        grabber.printPosition();
+        telemetry.update();
 
-        double tgtPower;
+        //Run stuff
         while (opModeIsActive()) {
-            // move motor
-            tgtPower = -gamepad1.left_stick_y;
-            motorTest.setPower(tgtPower);
+            wheels.run();
+            arm.run();
 
-            // move servo
-            if (gamepad1.a) {
-                telemetry.addData(">", "button 'A' pressed :D");
-                testServo.setPosition(0); // 0 degrees
-            } else if (gamepad1.b) {
-                telemetry.addData(">", "button 'B' pressed :D");
-                testServo.setPosition(1); // 180 degrees
-            }
+            wrist.run();
+
+            grabber.run();
+            grabber.printPosition();
+
+            camera.run();
 
             telemetry.update();
+
+            // Save CPU resources; can resume streaming when needed.
+            if (gamepad2.dpad_down) {
+                camera.stopStreaming();
+            } else if (gamepad2.dpad_up) {
+                camera.resumeStreaming();
+            }
+
+            sleep(20);
         }
     }
-
 }
+
+
 
