@@ -23,7 +23,7 @@ public class MintCamera {
 
     // Variables
     Telemetry telemetry;
-    AprilTagProcessor aprilTag;
+    AprilTagProcessor myAprilTagProc;
     VisionPortal visionPortal;
 
     // Constructor
@@ -31,10 +31,18 @@ public class MintCamera {
         telemetry = aTelemetry;
 
         // Create the AprilTag processor
-        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+        AprilTagProcessor.Builder myAprilTagProcBuilder;
+
+        myAprilTagProcBuilder = new AprilTagProcessor.Builder()
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true);
+
+        myAprilTagProc = myAprilTagProcBuilder.build();
 
         // Create the vision portal
-        visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, cameraName), aprilTag);
+        visionPortal = VisionPortal.easyCreateWithDefaults(hardwareMap.get(WebcamName.class, cameraName), myAprilTagProc);
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -42,7 +50,7 @@ public class MintCamera {
     }
 
     public void run() {
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        List<AprilTagDetection> currentDetections = myAprilTagProc.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
         // Step through the list of detections and display info for each one.
