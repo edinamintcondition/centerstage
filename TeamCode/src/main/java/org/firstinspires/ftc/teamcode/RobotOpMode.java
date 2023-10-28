@@ -14,14 +14,14 @@ public class RobotOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-//        //Gamepad 1
-//        MintWheels wheels = new MintWheels(hardwareMap, gamepad1, telemetry);
-//
-//        //Gamepad 2
-//        MintArm arm = new MintArm(hardwareMap, gamepad2, telemetry);
-//        MintWrist wrist = new MintWrist(hardwareMap, gamepad2, telemetry);
-//        MintGrabber grabber = new MintGrabber(hardwareMap, gamepad2, telemetry);
-//
+        //Gamepad 1
+        MintWheels wheels = new MintWheels(hardwareMap, gamepad1, telemetry);
+
+        //Gamepad 2
+        MintArm arm = new MintArm(hardwareMap, gamepad2, telemetry);
+        MintWrist wrist = new MintWrist(hardwareMap, gamepad2, telemetry);
+        MintGrabber grabber = new MintGrabber(hardwareMap, gamepad2, telemetry);
+
         //Camera
         MintCamera camera  = new MintCamera(hardwareMap,  telemetry);
 
@@ -29,18 +29,18 @@ public class RobotOpMode extends LinearOpMode {
         waitForStart();
 
         telemetry.addData(">", "Starting Program");
-//        grabber.printPosition();
+        grabber.printPosition();
         telemetry.update();
 
         //Run stuff
         while (opModeIsActive()) {
-       /*     wheels.run();
+            wheels.run();
             arm.run();
 
             wrist.run();
 
             grabber.run();
-            grabber.printPosition();*/
+            grabber.printPosition();
 
             camera.run();
 
