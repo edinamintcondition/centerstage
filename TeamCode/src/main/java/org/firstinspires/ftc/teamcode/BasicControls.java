@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,9 +22,7 @@ public class BasicControls extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        armMotor.setTargetPosition(0);
-        armMotor.setPower(0.6);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
         waitForStart();
         while (opModeIsActive()) {
@@ -38,13 +38,16 @@ public class BasicControls extends LinearOpMode {
             double rightBackPower = axial + lateral - yaw;
 
             //Arm
-            double angle = gamepad2.right_stick_y * 20;
+            double angle = gamepad2.right_stick_y * 45;
             telemetry.addData("angle", angle);
+            telemetry.addData("Current Position", armMotor.getCurrentPosition());
             telemetry.update();
-            armMotor.setTargetPosition((int)angle);
-            armMotor.setPower(0.6);
+            armMotor.setTargetPosition((int) angle);
+            armMotor.setPower(1);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            
+            /*double armPower = gamepad2.right_stick_y * 0.5;
+            armMotor.setPower(armPower);*/
+
             //Max power of any motor, either direction
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
             max = Math.max(max, Math.abs(leftBackPower));
