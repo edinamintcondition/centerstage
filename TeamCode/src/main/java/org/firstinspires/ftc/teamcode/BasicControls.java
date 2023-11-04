@@ -5,6 +5,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class BasicControls extends LinearOpMode {
@@ -16,6 +17,7 @@ public class BasicControls extends LinearOpMode {
         DcMotor leftBackDrive = hardwareMap.get(DcMotor.class, "back_left_motor");
         DcMotor rightBackDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
         DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
+        Servo testServo = hardwareMap.get(Servo.class, "test_servo");
 
         //Sets motor direction
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -69,6 +71,13 @@ public class BasicControls extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightFrontDrive.setPower(rightFrontPower);
             rightBackDrive.setPower(rightBackPower);
+
+            double pos = testServo.getPosition();
+            if(gamepad2.x)
+                testServo.setPosition(pos - 0.1);
+
+            if(gamepad2.y)
+                testServo.setPosition(pos + 0.1);
         }
     }
 }
