@@ -1,12 +1,7 @@
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
-
-import static java.util.Arrays.asList;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import java.util.Collections;
 
 import parts.MintArm;
 import parts.MintCamera;
@@ -15,7 +10,7 @@ import parts.MintGrabber;
 import parts.MintWrist;
 
 @TeleOp
-public class DDClawTest extends LinearOpMode {
+public class RobotOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
