@@ -34,4 +34,6 @@ public class MintWrist {
         double tgtPower = -gamepad.left_stick_y;
         myServo.setPower(tgtPower);
     }
+
+
 }
