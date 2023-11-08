@@ -49,12 +49,17 @@ public class RobotOpMode extends LinearOpMode {
             // Save CPU resources; can resume streaming when needed.
             if (gamepad2.dpad_down) {
                 camera.stopStreaming();
+                telemetry.addData(">", "camara not streaming :(");
             } else if (gamepad2.dpad_up) {
                 camera.resumeStreaming();
+                telemetry.addData(">", "camara streaming :D");
             }
+
+            telemetry.update();
 
             sleep(20);
         }
+        camera.stopStreaming();
     }
 }
 
