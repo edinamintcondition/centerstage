@@ -10,7 +10,7 @@ public class MintWrist {
 
     // Constants
     String servoName = "wrist_servo";
-    final double FINAL_POSITION = 0.5;
+    final double FINAL_POSITION = 1;
     final double START_POSITION = 0;
 
     // Variables
@@ -31,27 +31,33 @@ public class MintWrist {
     public void run() {
         String pressedButton = null;
         // move servo
-        if (gamepad.dpad_up) {
-            pressedButton = "dpad up";
-            rotateClock(); // rotate clockwise;
-        } else if (gamepad.dpad_down) {
-            pressedButton = "dpad down";
-            rotateCounterClock(); // rotate counterclockwise
-//        } else {
-            //          stop(); // stops rotation
-            //        pressedButton = "nothing";
-        }
+        if (gamepad.a) {
+            pressedButton = "'a'";
+            positionOne(); // extend;
+        } else if (gamepad.b) {
+            pressedButton = "'b'";
+            positionZero(); // retract
+        } else if (gamepad.x) {
+            pressedButton = "'x'";
+        } else if (gamepad.y)
+            pressedButton = "'y'";
 
         telemetry.addData(">", pressedButton + " is pressed :D");
     }
 
-    public void rotateClock() {
-        myServo.setPosition(FINAL_POSITION); // rotate clockwise
+
+    public void positionZero() {
+        myServo.setPosition(START_POSITION); // retracts
+        telemetry.addData(">","wrist in..");
     }
 
-    public void rotateCounterClock() {
-        myServo.setPosition(START_POSITION); // rotate counterclockwise
+    public void positionOne() {
+        myServo.setPosition(FINAL_POSITION); // extends
+        telemetry.addData(">","wrist out!");
     }
 
+    public void positionTwo() {}
+
+    public void positionTea() {}
 
 }
