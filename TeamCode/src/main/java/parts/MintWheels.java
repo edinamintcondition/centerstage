@@ -4,6 +4,7 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.max;
+import static java.util.Collections.min;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -14,12 +15,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class MintWheels {
 
     // Constants
-    //Sets power to 60%
-    double powerLimit = 0.60;
+    double forewardPowerLimit = 0.60;
+    double backwardPowerLimit = -0.60;
 
     // Variables
     Gamepad gamepad;
     Telemetry telemetry;
+    String speedCaption = "normal speed :p";
 
     DcMotor leftFront;
     DcMotor rightFront;
@@ -59,20 +61,30 @@ public class MintWheels {
         double rightBackPower = axial + lateral - yaw;
 
         double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
+        double min = min(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
 
         if (gamepad.right_bumper) {
-            powerLimit = 1.0;
+            forewardPowerLimit = 1.0;
+            backwardPowerLimit = -1.0;
+            this.speedCaption = ("TURBO MODE LETS GOOOOO");
+        } else {
+            forewardPowerLimit = 0.6;
+            backwardPowerLimit = -0.6;
+            this.speedCaption = ("normal speed :p");
         }
+        telemetry.addData(">", speedCaption);
 
-        controlWheel(leftFront, leftFrontPower, max);
-        controlWheel(rightFront, rightFrontPower, max);
-        controlWheel(leftBack, leftBackPower, max);
-        controlWheel(rightBack, rightBackPower, max);
+        controlWheel(leftFront, leftFrontPower, max, min);
+        controlWheel(rightFront, rightFrontPower, max, min);
+        controlWheel(leftBack, leftBackPower, max, min);
+        controlWheel(rightBack, rightBackPower, max, min);
     }
 
-    private void controlWheel(DcMotor motor, double tgtPower, double maxPower) {
-        if (maxPower > powerLimit) {
-            tgtPower *= powerLimit / maxPower;
+    private void controlWheel(DcMotor motor, double tgtPower, double maxPower, double minPower) {
+        if (maxPower > forewardPowerLimit) {
+            tgtPower *= forewardPowerLimit / maxPower;
+        } if (minPower < backwardPowerLimit) {
+            tgtPower *= backwardPowerLimit / minPower;
         }
 
         // move motor
