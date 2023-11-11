@@ -4,12 +4,17 @@ import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.max;
+import static java.util.Collections.min;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.AprilTagPositioning;
+import org.firstinspires.ftc.teamcode.Position;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 public class MintWheels {
 
@@ -92,20 +97,7 @@ public class MintWheels {
         telemetry.addData(motor.getDeviceName(), tgtPower);
     }
 
-    public void oneTileForward () {
-
-        //Applies the power to the motors
-        leftFrontDrive.setPower(leftFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        rightBackDrive.setPower(rightBackPower);
-
-        telemetry.addData("rx", rx);
-        telemetry.addData("ry", ry);
-        telemetry.addData("lateral", lateral);
-        telemetry.addData("axial", axial);
-        telemetry.addData("yaw", yaw);
-        telemetry.update();
+    public void setNavigation() {
     }
 
 }
