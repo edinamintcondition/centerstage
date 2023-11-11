@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -10,61 +12,91 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@TeleOp
+@Autonomous
 public class NavigationTest extends LinearOpMode {
-    private final double[] allmx = {29.381, 35.381, 41.381, 100.0435, 106.0435, 112.0435};
-    private final double[] allmy = {132.492908, 132.492908, 132.492908, 132.492908, 132.492908, 132.492908, 0, 0, 0, 0};
 
     @Override
     public void runOpMode() {
-        AprilTagProcessor.Builder myAprilTagProcBuilder;
-        AprilTagProcessor myAprilTagProc;
-
-        myAprilTagProcBuilder = new AprilTagProcessor.Builder()
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true);
-
-        myAprilTagProc = myAprilTagProcBuilder.build();
+        AprilTagPositioning pos = new AprilTagPositioning();
 
         WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
-        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, myAprilTagProc);
+        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, pos.myAprilTagProc);
+
+        DcMotor leftFrontDrive = hardwareMap.get(DcMotor.class, "front_left_motor");
+        DcMotor rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right_motor");
+        DcMotor leftBackDrive = hardwareMap.get(DcMotor.class, "back_left_motor");
+        DcMotor rightBackDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
+
+        //Sets motor direction
+        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
 
         while (opModeIsActive()) {
+            Position currentPos = pos.getPosition();
+            if (currentPos == null)
+                continue;
 
-            List<AprilTagDetection> currentDetections = myAprilTagProc.getDetections();
-            for (AprilTagDetection detection : currentDetections) {
-                if (detection.metadata != null && detection.id <= 6) {
-                    int i = detection.id - 1;
+            double rx = currentPos.x;
+            double ry = currentPos.y;
+            double a = currentPos.a;
+            double dx = currentPos.dx;
+            double dy = currentPos.dy;
 
-                    double mx = allmx[i];
-                    double my = allmy[i];
+            double goalY = 120;
+            double goalX = 98;
+            double goalYaw = 0;
 
-                    double mc = Math.sqrt((detection.ftcPose.x * detection.ftcPose.x) + (detection.ftcPose.y * detection.ftcPose.y));
+            double ty = goalY - ry;
+            double tx = goalX - rx;
 
-                    double dx = Math.sin(Math.toRadians(detection.ftcPose.yaw));
-                    double dy = Math.cos(Math.toRadians(detection.ftcPose.yaw));
+            double axial = (tx * dx) + (ty * dy);
+            double lateral = (tx * dy) - (ty * dx);
+            double yaw = a - goalYaw;
+            yaw = 0;
 
-                    double qc = dx * mc;
-                    double rx = qc + mx;
-
-                    double mq = dy * mc;
-                    double ry = my - mq;
-
-                    telemetry.addData("ID", detection.id);
-                    telemetry.addData("cx", detection.ftcPose.x);
-                    telemetry.addData("cy", detection.ftcPose.y);
-                    telemetry.addData("yaw", detection.ftcPose.yaw);
-                    telemetry.addData("rx", rx);
-                    telemetry.addData("ry", ry);
-                    telemetry.addData("dx", dx);
-                    telemetry.addData("dy", dy);
-                    break;
-                }
+            if (yaw < -180) {
+                yaw = yaw + 360;
             }
+
+            if (yaw > 180) {
+                yaw = yaw - 360;
+            }
+
+            //These turn a joystick input into a number
+            double leftFrontPower = axial - lateral + yaw;
+            double rightFrontPower = axial + lateral - yaw;
+            double leftBackPower = axial + lateral + yaw;
+            double rightBackPower = axial - lateral - yaw;
+
+            //Max power of any motor, either direction
+            double max;
+            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+            max = Math.max(max, Math.abs(leftBackPower));
+            max = Math.max(max, Math.abs(rightBackPower));
+
+            double powerLimit = 0.25;
+            if (max > powerLimit) {
+                leftFrontPower *= powerLimit / max;
+                rightFrontPower *= powerLimit / max;
+                leftBackPower *= powerLimit / max;
+                rightBackPower *= powerLimit / max;
+            }
+
+            //Applies the power to the motors
+            leftFrontDrive.setPower(leftFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            rightBackDrive.setPower(rightBackPower);
+
+            telemetry.addData("rx", rx);
+            telemetry.addData("ry", ry);
+            telemetry.addData("lateral", lateral);
+            telemetry.addData("axial", axial);
+            telemetry.addData("yaw", yaw);
             telemetry.update();
         }
     }

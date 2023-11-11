@@ -30,17 +30,20 @@ public class BasicControls extends LinearOpMode {
         while (opModeIsActive()) {
             double max;
 
+            telemetry.addData("LS X",gamepad1.left_stick_x);
+            telemetry.update();
+
             //These turn a joystick input into a number
             double axial = -gamepad1.left_stick_y;
             double lateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x;
-            double leftFrontPower = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
+            double leftFrontPower = axial - lateral + yaw;
+            double rightFrontPower = axial + lateral - yaw;
+            double leftBackPower = axial + lateral + yaw;
+            double rightBackPower = axial - lateral - yaw;
 
             //Arm
-            double angle = gamepad2.right_stick_y * 45;
+            /*double angle = gamepad2.right_stick_y * 45;
             telemetry.addData("angle", angle);
             telemetry.addData("Current Position", armMotor.getCurrentPosition());
             telemetry.update();
@@ -56,7 +59,7 @@ public class BasicControls extends LinearOpMode {
             max = Math.max(max, Math.abs(rightBackPower));
 
             //Sets power to 60% unless RB is pressed on game pad 1
-            double powerLimit = 0.60;
+            double powerLimit = 0.20;
             if (gamepad1.right_bumper)
                 powerLimit = 1.0;
             if (max > powerLimit) {
@@ -72,12 +75,12 @@ public class BasicControls extends LinearOpMode {
             rightFrontDrive.setPower(rightFrontPower);
             rightBackDrive.setPower(rightBackPower);
 
-            double pos = testServo.getPosition();
-            if(gamepad2.x)
-                testServo.setPosition(pos - 0.1);
-
-            if(gamepad2.y)
-                testServo.setPosition(pos + 0.1);
+//            double pos = testServo.getPosition();
+//            if(gamepad2.x)
+//                testServo.setPosition(pos - 0.1);
+//
+//            if(gamepad2.y)
+//                testServo.setPosition(pos + 0.1);
         }
     }
 }
