@@ -14,7 +14,7 @@ public class ServoTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         MintGrabber grabber = new MintGrabber(hardwareMap, gamepad2, telemetry);
-        String button = "nothing";
+        String button;
 
         //Start OpMode
         waitForStart();
@@ -31,13 +31,10 @@ public class ServoTest extends LinearOpMode {
 
             if (gamepad2.left_bumper) {
                 button = "closing";
-                wait((long)0.5);
             } else if (gamepad2.right_bumper) {
                 button = "opening";
-                wait((long) 0.5);
             } else {
                 button = "being silly";
-                wait((long)0.5);
             }
 
             telemetry.addData("<", "the claw is " + button + " >:3");

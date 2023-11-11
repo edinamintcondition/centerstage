@@ -2,10 +2,9 @@ package parts;
 
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -20,13 +19,13 @@ public class MintWrist {
     // Variables
     Gamepad gamepad;
     Telemetry telemetry;
-    CRServo myServo;
+    Servo myServo;
 
     // Constructor
     public MintWrist(HardwareMap hardwareMap, Gamepad gamepadToUse, Telemetry aTelemetry) {
         gamepad = gamepadToUse;
 
-        myServo = hardwareMap.get(CRServo.class, servoName);
+        myServo = hardwareMap.get(Servo.class, servoName);
 
         telemetry = aTelemetry;
     }
