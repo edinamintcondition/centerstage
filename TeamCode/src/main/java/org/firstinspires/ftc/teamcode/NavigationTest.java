@@ -67,10 +67,10 @@ public class NavigationTest extends LinearOpMode {
             }
 
             //These turn a joystick input into a number
-            double leftFrontPower = axial - lateral + yaw;
-            double rightFrontPower = axial + lateral - yaw;
-            double leftBackPower = axial + lateral + yaw;
-            double rightBackPower = axial - lateral - yaw;
+            double leftFrontPower = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower = axial - lateral + yaw;
+            double rightBackPower = axial + lateral - yaw;
 
             //Max power of any motor, either direction
             double max;
