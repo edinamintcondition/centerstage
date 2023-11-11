@@ -27,6 +27,8 @@ public class MintArm {
         armMotor = hardwareMap.get(DcMotor.class, motorName);
         armMotor.setDirection(FORWARD);
 
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         telemetry = aTelemetry;
     }
 
