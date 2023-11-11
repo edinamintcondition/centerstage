@@ -5,5 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class Automonous extends LinearOpMode {
 
 
+    @Override
+    public void runOpMode() throws InterruptedException {
 
+    }
 }
