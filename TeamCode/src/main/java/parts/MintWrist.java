@@ -14,7 +14,7 @@ public class MintWrist {
     String servoName = "wrist_servo";
     final double FINAL_POSITION = 1;
     final double START_POSITION = 0;
-    final double FLAT = 0.8  ;
+    final double FLAT = 0.7;
 
     // Variables
     Gamepad gamepad;
@@ -36,17 +36,18 @@ public class MintWrist {
         // move servo
         if (gamepad.a) {
             pressedButton = "'a'";
-            positionOne(); // fully extend
+            positionTwo(); // fully extend
         } else if (gamepad.b) {
             pressedButton = "'b'";
             positionZero(); // retract
         } else if (gamepad.x) {
             pressedButton = "'x'";
-            positionTwo(); // extend until flat with the ground
+            positionOne(); // extend until flat with the ground
         } else if (gamepad.y)
             pressedButton = "'y'";
 
         telemetry.addData(">", pressedButton + " is pressed :D");
+        telemetry.addData("Servo position:", myServo.getPosition());
     }
 
 
