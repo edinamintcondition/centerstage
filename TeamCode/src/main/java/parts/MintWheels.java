@@ -15,7 +15,8 @@ public class MintWheels {
 
     // Constants
     //Sets power to 60%
-    double powerLimit = 0.60;
+    double forwardPowerLimit = 0.60;
+    double backwardPowerLimit = -0.60;
 
     // Variables
     Gamepad gamepad;
@@ -59,20 +60,29 @@ public class MintWheels {
         double rightBackPower = axial + lateral - yaw;
 
         double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
+        double min = min(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
 
         if (gamepad.right_bumper) {
-            powerLimit = 1.0;
+            forwardPowerLimit = 1.0;
+            backwardPowerLimit = -1.0;
+            telemetry.addData(">", "TURBO LETS GOOOO");
+        } else {
+            forwardPowerLimit = 0.6;
+            backwardPowerLimit = -0.6;
+            telemetry.addData( ">", "normal speed :b");
         }
 
-        controlWheel(leftFront, leftFrontPower, max);
-        controlWheel(rightFront, rightFrontPower, max);
-        controlWheel(leftBack, leftBackPower, max);
-        controlWheel(rightBack, rightBackPower, max);
+        controlWheel(leftFront, leftFrontPower, max, min);
+        controlWheel(rightFront, rightFrontPower, max, min);
+        controlWheel(leftBack, leftBackPower, max, min);
+        controlWheel(rightBack, rightBackPower, max, min);
     }
 
-    private void controlWheel(DcMotor motor, double tgtPower, double maxPower) {
-        if (maxPower > powerLimit) {
-            tgtPower *= powerLimit / maxPower;
+    private void controlWheel(DcMotor motor, double tgtPower, double maxPower, double minPower) {
+        if (maxPower > forwardPowerLimit) {
+            tgtPower *= forwardPowerLimit / maxPower;
+        } else if (minPower > backwardPowerLimit) {
+            tgtPower *= backwardPowerLimit / minPower;
         }
 
         // move motor
@@ -84,6 +94,18 @@ public class MintWheels {
 
     public void oneTileForward () {
 
+        //Applies the power to the motors
+        leftFrontDrive.setPower(leftFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        rightBackDrive.setPower(rightBackPower);
+
+        telemetry.addData("rx", rx);
+        telemetry.addData("ry", ry);
+        telemetry.addData("lateral", lateral);
+        telemetry.addData("axial", axial);
+        telemetry.addData("yaw", yaw);
+        telemetry.update();
     }
 
 }
