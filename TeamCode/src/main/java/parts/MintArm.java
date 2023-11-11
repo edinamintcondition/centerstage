@@ -30,6 +30,14 @@ public class MintArm {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry = aTelemetry;
+
+        if (gamepad.left_trigger > 0.8) {
+            powerLimit = 1.0;
+            telemetry.addData(">", "STRONGARM HAHAHA");
+        } else {
+            powerLimit = 0.5;
+            telemetry.addData(">", "normal arm power");
+        }
     }
 
     //Methods
