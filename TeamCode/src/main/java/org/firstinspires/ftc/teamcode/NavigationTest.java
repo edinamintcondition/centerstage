@@ -19,9 +19,11 @@ public class NavigationTest extends LinearOpMode {
     public void runOpMode() {
         AprilTagPositioning pos = new AprilTagPositioning();
 
+        //set camera
         WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
         VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, pos.myAprilTagProc);
 
+        //set motors
         DcMotor leftFrontDrive = hardwareMap.get(DcMotor.class, "front_left_motor");
         DcMotor rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right_motor");
         DcMotor leftBackDrive = hardwareMap.get(DcMotor.class, "back_left_motor");
