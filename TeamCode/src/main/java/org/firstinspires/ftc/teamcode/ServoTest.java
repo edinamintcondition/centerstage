@@ -8,7 +8,7 @@ import parts.MintGrabber;
 import parts.MintWrist;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class ServoTest extends LinearOpMode {
 
     @Override
@@ -32,24 +32,36 @@ public class ServoTest extends LinearOpMode {
             telemetry.update();
 
             if (gamepad1.a || gamepad2.a) {
-                grabber.run();
-                grabber.printPosition();
 
-                if (gamepad2.left_bumper) {
-                    button = "closing";
-                } else if (gamepad2.right_bumper) {
-                    button = "opening";
-                } else {
-                    button = "being silly";
-                }
-
-                telemetry.addData("<", "the claw is " + button + " >:3");
+                telemetry.addData("<", "this is the grabber program");
                 telemetry.update();
 
+                while (opModeIsActive()) {
+
+                    grabber.run();
+                    grabber.printPosition();
+
+                    if (gamepad2.left_bumper) {
+                        button = "closing";
+                    } else if (gamepad2.right_bumper) {
+                        button = "opening";
+                    } else {
+                        button = "being silly";
+                    }
+
+                    telemetry.addData("<", "the claw is " + button + " >:3");
+                    telemetry.update();
+                }
+
             } else if (gamepad1.b || gamepad2.b) {
-                wrist.run();
 
+                telemetry.addData("<", "this is the grabber program");
+                telemetry.update();
 
+                while (opModeIsActive()) {
+                    wrist.run();
+
+                }
             }
         }
     }
