@@ -37,10 +37,10 @@ public class BasicControls extends LinearOpMode {
             double axial = -gamepad1.left_stick_y;
             double lateral = gamepad1.left_stick_x;
             double yaw = gamepad1.right_stick_x;
-            double leftFrontPower = axial - lateral + yaw;
-            double rightFrontPower = axial + lateral - yaw;
-            double leftBackPower = axial + lateral + yaw;
-            double rightBackPower = axial - lateral - yaw;
+            double leftFrontPower = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower = axial - lateral + yaw;
+            double rightBackPower = axial + lateral - yaw;
 
             //Arm
             /*double angle = gamepad2.right_stick_y * 45;
