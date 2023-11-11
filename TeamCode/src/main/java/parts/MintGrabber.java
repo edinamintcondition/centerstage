@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class MintGrabber {
 
     //Constants
-    String servoName = "test_servo";
+    String servoName = "grab_servo";
     final double FINAL_POSITION = 0.5;
     final double START_POSITION = 0;
 
