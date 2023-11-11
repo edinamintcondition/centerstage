@@ -1,5 +1,8 @@
 package parts;
 
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -9,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class MintGrabber {
 
     //Constants
-    String servoName = "grab_servo";
+    String servoName = "test_servo";
     final double FINAL_POSITION = 0.5;
     final double START_POSITION = 0;
 
@@ -32,10 +35,10 @@ public class MintGrabber {
         String pressedButton = null;
         // move servo
         if (gamepad.left_bumper) {
-            pressedButton = "left bumper";
+            pressedButton = "left";
             rotateClock(); // rotate clockwise;
         } else if (gamepad.right_bumper) {
-            pressedButton = "right bumper";
+            pressedButton = "right";
             rotateCounterClock(); // rotate counterclockwise
 //        } else {
             //          stop(); // stops rotation
@@ -56,6 +59,14 @@ public class MintGrabber {
 
     public void printPosition() {
         telemetry.addData("Servo Position", "%5.2f", myServo.getPosition());
+    }
+
+    public void stop() {
+        myServo.setPosition(START_POSITION); // stops rotation
+    }
+
+    public void start() {
+
     }
 
 }
