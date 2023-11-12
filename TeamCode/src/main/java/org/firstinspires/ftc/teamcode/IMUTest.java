@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.BNO055IMUNew;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -49,16 +48,16 @@ public class IMUTest extends LinearOpMode {
             double xRotationRate = myRobotAngularVelocity.xRotationRate;
             double yRotationRate = myRobotAngularVelocity.yRotationRate;
             double zRotationRate = myRobotAngularVelocity.zRotationRate;
-            double X_axis = myRobotOrientation.firstAngle;
-            double Y_axis = myRobotOrientation.secondAngle;
-            double Z_axis = myRobotOrientation.thirdAngle;
+            double xAxis = myRobotOrientation.firstAngle;
+            double yAxis = myRobotOrientation.secondAngle;
+            double zAxis = myRobotOrientation.thirdAngle;
 
             telemetry.addData("z rotation", zRotationRate);
             telemetry.addData("x rotation", xRotationRate);
             telemetry.addData("y rotation", yRotationRate);
-            telemetry.addData("x angle", X_axis);
-            telemetry.addData("z angle", Z_axis);
-            telemetry.addData("y angle", Y_axis);
+            telemetry.addData("x angle", xAxis);
+            telemetry.addData("z angle", zAxis);
+            telemetry.addData("y angle", yAxis);
             telemetry.update();
         }
     }
