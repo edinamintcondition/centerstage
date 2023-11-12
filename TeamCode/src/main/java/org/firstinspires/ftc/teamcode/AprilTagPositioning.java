@@ -34,7 +34,7 @@ public class AprilTagPositioning implements IPositioning {
                 double mc = Math.sqrt((detection.ftcPose.x * detection.ftcPose.x) + (detection.ftcPose.y * detection.ftcPose.y));
 
                 double a = detection.ftcPose.yaw;
-                double dx = -Math.sin(Math.toRadians(detection.ftcPose.yaw));
+                double dx = Math.sin(Math.toRadians(detection.ftcPose.yaw));
                 double dy = Math.cos(Math.toRadians(detection.ftcPose.yaw));
 
                 double qc = dx * mc;

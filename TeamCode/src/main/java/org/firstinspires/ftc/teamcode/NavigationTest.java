@@ -10,6 +10,8 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import parts.MintWheels;
+
 import java.util.List;
 
 @Autonomous
@@ -18,22 +20,11 @@ public class NavigationTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         AprilTagPositioning pos = new AprilTagPositioning();
+        MintWheels autoDrive = new MintWheels(hardwareMap, gamepad1, telemetry);
 
         //set camera
         WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
         VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, pos.myAprilTagProc);
-
-        //set motors
-        DcMotor leftFrontDrive = hardwareMap.get(DcMotor.class, "front_left_motor");
-        DcMotor rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right_motor");
-        DcMotor leftBackDrive = hardwareMap.get(DcMotor.class, "back_left_motor");
-        DcMotor rightBackDrive = hardwareMap.get(DcMotor.class, "back_right_motor");
-
-        //Sets motor direction
-        leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
 
@@ -49,7 +40,7 @@ public class NavigationTest extends LinearOpMode {
             double dy = currentPos.dy;
 
             double goalY = 120;
-            double goalX = 98;
+            double goalX = 90;
             double goalYaw = 0;
 
             double ty = goalY - ry;
@@ -68,38 +59,16 @@ public class NavigationTest extends LinearOpMode {
                 yaw = yaw - 360;
             }
 
-            //These turn a joystick input into a number
-            double leftFrontPower = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower = axial - lateral + yaw;
-            double rightBackPower = axial + lateral - yaw;
-
-            //Max power of any motor, either direction
-            double max;
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-
             double powerLimit = 0.25;
-            if (max > powerLimit) {
-                leftFrontPower *= powerLimit / max;
-                rightFrontPower *= powerLimit / max;
-                leftBackPower *= powerLimit / max;
-                rightBackPower *= powerLimit / max;
-            }
 
-            //Applies the power to the motors
-            leftFrontDrive.setPower(leftFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            rightBackDrive.setPower(rightBackPower);
-
-            telemetry.addData("rx", rx);
-            telemetry.addData("ry", ry);
-            telemetry.addData("lateral", lateral);
-            telemetry.addData("axial", axial);
-            telemetry.addData("yaw", yaw);
+            telemetry.addData("r", "%.1f, %.1f", rx, ry);
+            telemetry.addData("a", "%.1f", a);
+            telemetry.addData("d", "%.1f, %.1f", dx,dy);
+            telemetry.addData("ax lat", "%.1f, %.1f", axial, lateral);
+            telemetry.addData("yaw","%.1f",yaw);
             telemetry.update();
+
+            autoDrive.runAny(axial, lateral, yaw, powerLimit);
         }
     }
 }

@@ -35,6 +35,7 @@ public class RobotOpMode extends LinearOpMode {
         //Run stuff
         while (opModeIsActive()) {
             wheels.run();
+
             arm.run();
 
             wrist.run();

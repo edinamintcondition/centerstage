@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.Position;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 public class MintWheels {
-
     // Constants
     //Sets power to 60%
     double forwardPowerLimit = 0.60;
@@ -40,10 +39,10 @@ public class MintWheels {
         leftFront.setDirection(FORWARD);
 
         rightFront = hardwareMap.get(DcMotor.class, "front_right_motor");
-        rightFront.setDirection(FORWARD);
+        rightFront.setDirection(REVERSE);
 
         leftBack = hardwareMap.get(DcMotor.class, "back_left_motor");
-        leftBack.setDirection(REVERSE);
+        leftBack.setDirection(FORWARD);
 
         rightBack = hardwareMap.get(DcMotor.class, "back_right_motor");
         rightBack.setDirection(REVERSE);
@@ -100,4 +99,29 @@ public class MintWheels {
     public void setNavigation() {
     }
 
+    public void runAny(double axial, double lateral, double yaw, double powerLimit) {
+        double max;
+
+        double leftFrontPower = axial + lateral - yaw;
+        double leftBackPower = axial - lateral - yaw;
+        double rightFrontPower = axial - lateral + yaw;
+        double rightBackPower = axial + lateral + yaw;
+
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > powerLimit) {
+            leftFrontPower *= powerLimit / max;
+            rightFrontPower *= powerLimit / max;
+            leftBackPower *= powerLimit / max;
+            rightBackPower *= powerLimit / max;
+        }
+
+        //Applies the power to the motors
+        leftFront.setPower(leftFrontPower);
+        leftBack.setPower(leftBackPower);
+        rightFront.setPower(rightFrontPower);
+        rightBack.setPower(rightBackPower);
+    }
 }
