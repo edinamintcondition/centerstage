@@ -57,29 +57,16 @@ public class MintWheels {
         double lateral = gamepad.left_stick_x;
         double yaw = gamepad.right_stick_x;
 
-        //Calculates the wheel direction
-        double leftFrontPower = axial + lateral + yaw;
-        double rightFrontPower = axial - lateral - yaw;
-        double leftBackPower = axial - lateral + yaw;
-        double rightBackPower = axial + lateral - yaw;
-
-        double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
-        double min = min(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
-
+        double powerLimit = 0.6;
         if (gamepad.right_bumper) {
-            forwardPowerLimit = 1.0;
-            backwardPowerLimit = -1.0;
+            powerLimit = 1;
             telemetry.addData(">", "TURBO LETS GOOOO");
-        } else {
-            forwardPowerLimit = 0.6;
-            backwardPowerLimit = -0.6;
-            telemetry.addData( ">", "normal speed :b");
+        } else if (gamepad.left_bumper) {
+            powerLimit = 0.3;
+            telemetry.addData( ">", "slow speed :b");
         }
 
-        controlWheel(leftFront, leftFrontPower, max, min);
-        controlWheel(rightFront, rightFrontPower, max, min);
-        controlWheel(leftBack, leftBackPower, max, min);
-        controlWheel(rightBack, rightBackPower, max, min);
+        runAny(axial, lateral, yaw, powerLimit);
     }
 
     private void controlWheel(DcMotor motor, double tgtPower, double maxPower, double minPower) {
