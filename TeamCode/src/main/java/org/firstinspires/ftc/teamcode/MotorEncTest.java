@@ -7,17 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.hardware.bosch.BNO055IMUNew;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.IMU;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Autonomous
 public class MotorEncTest extends LinearOpMode {
@@ -40,12 +29,12 @@ public class MotorEncTest extends LinearOpMode {
                 rightBack
         };
 
-        DcMotor[] frontMotors = new DcMotor[]{
+        DcMotor[] fwdMotors = new DcMotor[]{
                 leftFront,
                 rightBack
         };
 
-        DcMotor[] backMotors = new DcMotor[]{
+        DcMotor[] revMotors = new DcMotor[]{
                 leftBack,
                 rightFront
         };
@@ -56,11 +45,11 @@ public class MotorEncTest extends LinearOpMode {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
-        strafeDistance(3.75, frontMotors, backMotors);
+        strafeDistance(3.75, fwdMotors, revMotors);
         sleep(200);
         driveDistance(72, motors);
         sleep(200);
-        strafeDistance(24, frontMotors, backMotors);
+        strafeDistance(24, fwdMotors, revMotors);
         sleep(200);
         driveDistance(10, motors);
         sleep(200);
@@ -89,7 +78,7 @@ public class MotorEncTest extends LinearOpMode {
         }
 
         while (opModeIsActive()) {
-            if (!areBusy(motors)) {
+            if (areIdle(motors)) {
                 break;
             }
         }
@@ -113,13 +102,13 @@ public class MotorEncTest extends LinearOpMode {
         }
 
         while (opModeIsActive()) {
-            if (!areBusy(motors)) {
+            if (areIdle(motors)) {
                 break;
             }
         }
     }
 
-    private void strafeDistance(double targetDist, DcMotor[] frontMotors, DcMotor[] backMotors) {
+    private void strafeDistance(double targetDist, DcMotor[] fwdMotors, DcMotor[] revMotors) {
         double fastLimit = 10;
         double ppi = 50.09;
 
@@ -132,31 +121,31 @@ public class MotorEncTest extends LinearOpMode {
             power = .3;
         }
 
-        for (DcMotor m : frontMotors) {
+        for (DcMotor m : fwdMotors) {
             m.setTargetPosition(targetPos);
             m.setPower(power);
             m.setMode(RUN_TO_POSITION);
         }
 
-        for (DcMotor m : backMotors) {
+        for (DcMotor m : revMotors) {
             m.setTargetPosition(-targetPos);
             m.setPower(power);
             m.setMode(RUN_TO_POSITION);
         }
 
         while (opModeIsActive()) {
-            if (!areBusy(backMotors) && !areBusy(frontMotors)) {
+            if (areIdle(revMotors) && areIdle(fwdMotors)) {
                 break;
             }
         }
     }
 
-    private boolean areBusy(DcMotor[] motors) {
+    private boolean areIdle(DcMotor[] motors) {
         for (DcMotor m : motors) {
             if (m.isBusy()) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
