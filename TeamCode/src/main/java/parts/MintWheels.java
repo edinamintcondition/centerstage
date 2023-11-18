@@ -65,7 +65,8 @@ public class MintWheels {
 
 
         if (gamepad.right_bumper) {
-            powerLimit = 1;
+            forwardPowerLimit = 1.0;
+            backwardPowerLimit = -1;
             telemetry.addData(">", "TURBO LETS GOOOO");
         } else if (gamepad.left_bumper) {
             forwardPowerLimit = 0.2;
