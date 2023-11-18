@@ -3,64 +3,89 @@ package org.firstinspires.ftc.teamcode;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
+import com.qualcomm.hardware.bosch.BNO055IMUNew;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous
-public class MotorEncTest extends LinearOpMode {
+public class AutoOpMode extends LinearOpMode {
+
+    double gearRatio = 40;
+
+    Positioning posn;
+
+    DcMotor[] motors, revMotors, fwdMotors;
+
     @Override
     public void runOpMode() {
         DcMotor leftFront = hardwareMap.get(DcMotor.class, "front_left_motor");
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "front_right_motor");
         DcMotor leftBack = hardwareMap.get(DcMotor.class, "back_left_motor");
         DcMotor rightBack = hardwareMap.get(DcMotor.class, "back_right_motor");
+        BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "IMU");
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        DcMotor[] motors = new DcMotor[]{
+        motors = new DcMotor[]{
                 leftFront,
                 leftBack,
                 rightFront,
                 rightBack
         };
 
-        DcMotor[] fwdMotors = new DcMotor[]{
+        fwdMotors = new DcMotor[]{
                 leftFront,
                 rightBack
         };
 
-        DcMotor[] revMotors = new DcMotor[]{
+        revMotors = new DcMotor[]{
                 leftBack,
                 rightFront
         };
 
         waitForStart();
 
+        posn = new Positioning(IMU);
+
+        telemetry.addData("heading", posn.getHeading());
+        telemetry.update();
+
         for (DcMotor m : motors) {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
-        strafeDistance(3.75, fwdMotors, revMotors);
+        rotateToHeading(135);
+
+        telemetry.addData("heading", posn.getHeading());
+        telemetry.update();
+
+        sleep(1000);
+
+        rotateToHeading(-135);
+        sleep(2000);
+
+        strafeDistance(3.75);
         sleep(200);
-        driveDistance(72, motors);
+        driveDistance(40);
         sleep(200);
-        strafeDistance(24, fwdMotors, revMotors);
+        strafeDistance(16);
         sleep(200);
-        driveDistance(10, motors);
+        driveDistance(5);
         sleep(200);
-        driveDistance(-10, motors);
+        driveDistance(-5);
         sleep(200);
-        rotateAmount(180, motors);
+        rotateAmount(180);
     }
 
-    private void driveDistance(double targetDist, DcMotor[] motors) {
-        double fastLimit = 10;
+    private void driveDistance(double targetDist) {
         double ppi = 537.0 * 5 / 60.875;
+        ppi = ppi * (gearRatio / 20);
+        double fastLimit = 10;
 
         int targetPos = (int) (targetDist * ppi);
         double power;
@@ -72,29 +97,70 @@ public class MotorEncTest extends LinearOpMode {
         }
 
         for (DcMotor m : motors) {
-            m.setTargetPosition(targetPos);
+            int p = m.getCurrentPosition();
+            m.setTargetPosition(p + targetPos);
             m.setPower(power);
             m.setMode(RUN_TO_POSITION);
         }
 
         while (opModeIsActive()) {
-            if (areIdle(motors)) {
+            if (areIdle()) {
                 break;
             }
         }
     }
 
-    private void rotateAmount(double targetAngle, DcMotor[] motors) {
+    private void rotateToHeading(double targetHeading) {
         double ppd = 537.0 / 63.15;
+        ppd = ppd * (gearRatio / 20);
+
+        while (opModeIsActive()) {
+            double targetAngle = targetHeading - posn.getHeading();
+
+            if (targetAngle < -180) {
+                targetAngle = targetAngle + 360;
+            }
+            if (targetAngle > 180) {
+                targetAngle = targetAngle -360;
+            }
+
+            if (Math.abs(targetAngle) > 2) {
+                int targetPos = (int) (targetAngle * ppd);
+                double power = 0.5;
+
+                telemetry.addData("target pos", targetPos);
+                telemetry.update();
+
+                for (DcMotor m : motors) {
+                    int p = m.getCurrentPosition();
+                    if (m.getDirection() == DcMotorSimple.Direction.FORWARD) {
+                        m.setTargetPosition(p - targetPos);
+                    } else {
+                        m.setTargetPosition(p + targetPos);
+                    }
+
+                    m.setPower(power);
+                    m.setMode(RUN_TO_POSITION);
+                }
+            } else if (areIdle()) {
+                break;
+            }
+        }
+    }
+
+    private void rotateAmount(double targetAngle) {
+        double ppd = 537.0 / 63.15;
+        ppd = ppd * (gearRatio / 20);
 
         int targetPos = (int) (targetAngle * ppd);
         double power = 0.5;
 
         for (DcMotor m : motors) {
+            int p = m.getCurrentPosition();
             if (m.getDirection() == DcMotorSimple.Direction.FORWARD) {
-                m.setTargetPosition(-targetPos);
+                m.setTargetPosition(p - targetPos);
             } else {
-                m.setTargetPosition(targetPos);
+                m.setTargetPosition(p + targetPos);
             }
 
             m.setPower(power);
@@ -102,15 +168,17 @@ public class MotorEncTest extends LinearOpMode {
         }
 
         while (opModeIsActive()) {
-            if (areIdle(motors)) {
+            if (areIdle()) {
                 break;
             }
         }
     }
 
-    private void strafeDistance(double targetDist, DcMotor[] fwdMotors, DcMotor[] revMotors) {
+    private void strafeDistance(double targetDist) {
+
         double fastLimit = 10;
         double ppi = 50.09;
+        ppi = ppi * (gearRatio / 20);
 
         int targetPos = (int) (targetDist * ppi);
         double power;
@@ -122,25 +190,27 @@ public class MotorEncTest extends LinearOpMode {
         }
 
         for (DcMotor m : fwdMotors) {
-            m.setTargetPosition(targetPos);
+            int p = m.getCurrentPosition();
+            m.setTargetPosition(p + targetPos);
             m.setPower(power);
             m.setMode(RUN_TO_POSITION);
         }
 
         for (DcMotor m : revMotors) {
-            m.setTargetPosition(-targetPos);
+            int p = m.getCurrentPosition();
+            m.setTargetPosition(p - targetPos);
             m.setPower(power);
             m.setMode(RUN_TO_POSITION);
         }
 
         while (opModeIsActive()) {
-            if (areIdle(revMotors) && areIdle(fwdMotors)) {
+            if (areIdle()) {
                 break;
             }
         }
     }
 
-    private boolean areIdle(DcMotor[] motors) {
+    private boolean areIdle() {
         for (DcMotor m : motors) {
             if (m.isBusy()) {
                 return false;
