@@ -16,6 +16,8 @@ public class AutoOpMode extends LinearOpMode {
 
     Positioning posn;
 
+    Position currentPos;
+
     DcMotor[] motors, revMotors, fwdMotors;
 
     @Override
@@ -51,6 +53,7 @@ public class AutoOpMode extends LinearOpMode {
         waitForStart();
 
         posn = new Positioning(IMU);
+        currentPos = new Position(12, 36, 0, 1, 0);
 
         telemetry.addData("heading", posn.getHeading());
         telemetry.update();
@@ -59,17 +62,7 @@ public class AutoOpMode extends LinearOpMode {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
-        rotateToHeading(135);
-
-        telemetry.addData("heading", posn.getHeading());
-        telemetry.update();
-
-        sleep(1000);
-
-        rotateToHeading(-135);
-        sleep(2000);
-
-        strafeDistance(3.75);
+        strafeToClosestPoint(new Point(15, 36));
         sleep(200);
         driveDistance(40);
         sleep(200);
@@ -110,6 +103,68 @@ public class AutoOpMode extends LinearOpMode {
         }
     }
 
+    private void strafeToClosestPoint(Point target) {
+        double fastLimit = 10;
+        double ppi = 50.09;
+        ppi = ppi * (gearRatio / 20);
+
+        Position updatedPos = null;
+
+        while (opModeIsActive()) {
+            Position newCurPos = posn.getPosition();
+            if (newCurPos != null) {
+                this.currentPos = newCurPos;
+                updatedPos = null;
+            }
+
+            if (updatedPos == null) {
+                double targetDist = currentPos.toRobotRel(target).x;
+                if (Math.abs(targetDist) < 0.1) {
+                    break;
+                }
+
+                updatedPos = currentPos.addRobotRel(new Point(targetDist, 0));
+
+                int targetPos = (int) (targetDist * ppi);
+                double power;
+
+                if (targetDist > fastLimit) {
+                    power = 1;
+                } else {
+                    power = .3;
+                }
+
+                for (DcMotor m : fwdMotors) {
+                    int p = m.getCurrentPosition();
+                    m.setTargetPosition(p + targetPos);
+                    m.setPower(power);
+                    m.setMode(RUN_TO_POSITION);
+                }
+
+                for (DcMotor m : revMotors) {
+                    int p = m.getCurrentPosition();
+                    m.setTargetPosition(p - targetPos);
+                    m.setPower(power);
+                    m.setMode(RUN_TO_POSITION);
+                }
+            }
+
+            if (areIdle()) { // shouldn't really happen
+                break;
+            }
+        }
+
+        while (opModeIsActive()) {
+            if (areIdle()) {
+                break;
+            }
+        }
+
+        if (updatedPos != null) {
+            this.currentPos = updatedPos;
+        }
+    }
+
     private void rotateToHeading(double targetHeading) {
         double ppd = 537.0 / 63.15;
         ppd = ppd * (gearRatio / 20);
@@ -121,7 +176,7 @@ public class AutoOpMode extends LinearOpMode {
                 targetAngle = targetAngle + 360;
             }
             if (targetAngle > 180) {
-                targetAngle = targetAngle -360;
+                targetAngle = targetAngle - 360;
             }
 
             if (Math.abs(targetAngle) > 2) {
@@ -175,7 +230,6 @@ public class AutoOpMode extends LinearOpMode {
     }
 
     private void strafeDistance(double targetDist) {
-
         double fastLimit = 10;
         double ppi = 50.09;
         ppi = ppi * (gearRatio / 20);
