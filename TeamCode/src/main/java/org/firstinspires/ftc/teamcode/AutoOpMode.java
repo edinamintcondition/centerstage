@@ -63,43 +63,69 @@ public class AutoOpMode extends LinearOpMode {
         }
 
         strafeToClosestPoint(new Point(15, 36));
+        sleep(2000);
+        driveToClosestPoint(new Point(15, 76));
         sleep(200);
-        driveDistance(40);
+        strafeToClosestPoint(new Point(31, 76));
         sleep(200);
-        strafeDistance(16);
+        driveToClosestPoint(new Point(31, 81));
         sleep(200);
-        driveDistance(5);
+        driveToClosestPoint(new Point(31, 76));
         sleep(200);
-        driveDistance(-5);
-        sleep(200);
-        rotateAmount(180);
+        rotateToHeading(180);
     }
 
-    private void driveDistance(double targetDist) {
+    private void driveToClosestPoint(Point target) {
         double ppi = 537.0 * 5 / 60.875;
         ppi = ppi * (gearRatio / 20);
         double fastLimit = 10;
 
-        int targetPos = (int) (targetDist * ppi);
-        double power;
+        Position updatedPos = null;
 
-        if (targetDist > fastLimit) {
-            power = 1;
-        } else {
-            power = .25;
-        }
+        while (opModeIsActive()) {
+            Position newCurPos = posn.getPosition();
+            if (newCurPos != null) {
+                this.currentPos = newCurPos;
+                updatedPos = null;
+            }
 
-        for (DcMotor m : motors) {
-            int p = m.getCurrentPosition();
-            m.setTargetPosition(p + targetPos);
-            m.setPower(power);
-            m.setMode(RUN_TO_POSITION);
+            if (updatedPos == null) {
+                double targetDist = currentPos.toRobotRel(target).y;
+                if (Math.abs(targetDist) < 0.1) {
+                    break;
+                }
+
+                updatedPos = currentPos.addRobotRel(new Point(0, targetDist));
+
+                int targetPos = (int) (targetDist * ppi);
+                double power;
+
+                if (targetDist > fastLimit) {
+                    power = 1;
+                } else {
+                    power = .25;
+                }
+
+                for (DcMotor m : motors) {
+                    int p = m.getCurrentPosition();
+                    m.setTargetPosition(p + targetPos);
+                    m.setPower(power);
+                    m.setMode(RUN_TO_POSITION);
+                }
+
+                if (areIdle()) { // shouldn't really happen
+                    break;
+                }
+            }
         }
 
         while (opModeIsActive()) {
             if (areIdle()) {
                 break;
             }
+        }
+        if (updatedPos != null) {
+            this.currentPos = updatedPos;
         }
     }
 
@@ -198,67 +224,6 @@ public class AutoOpMode extends LinearOpMode {
                     m.setMode(RUN_TO_POSITION);
                 }
             } else if (areIdle()) {
-                break;
-            }
-        }
-    }
-
-    private void rotateAmount(double targetAngle) {
-        double ppd = 537.0 / 63.15;
-        ppd = ppd * (gearRatio / 20);
-
-        int targetPos = (int) (targetAngle * ppd);
-        double power = 0.5;
-
-        for (DcMotor m : motors) {
-            int p = m.getCurrentPosition();
-            if (m.getDirection() == DcMotorSimple.Direction.FORWARD) {
-                m.setTargetPosition(p - targetPos);
-            } else {
-                m.setTargetPosition(p + targetPos);
-            }
-
-            m.setPower(power);
-            m.setMode(RUN_TO_POSITION);
-        }
-
-        while (opModeIsActive()) {
-            if (areIdle()) {
-                break;
-            }
-        }
-    }
-
-    private void strafeDistance(double targetDist) {
-        double fastLimit = 10;
-        double ppi = 50.09;
-        ppi = ppi * (gearRatio / 20);
-
-        int targetPos = (int) (targetDist * ppi);
-        double power;
-
-        if (targetDist > fastLimit) {
-            power = 1;
-        } else {
-            power = .3;
-        }
-
-        for (DcMotor m : fwdMotors) {
-            int p = m.getCurrentPosition();
-            m.setTargetPosition(p + targetPos);
-            m.setPower(power);
-            m.setMode(RUN_TO_POSITION);
-        }
-
-        for (DcMotor m : revMotors) {
-            int p = m.getCurrentPosition();
-            m.setTargetPosition(p - targetPos);
-            m.setPower(power);
-            m.setMode(RUN_TO_POSITION);
-        }
-
-        while (opModeIsActive()) {
-            if (areIdle()) {
                 break;
             }
         }
