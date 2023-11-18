@@ -21,8 +21,8 @@ public final class Position {
         double tx = p.x - this.x;
         double ty = p.y - this.y;
         return new Point(
-                (tx * dx) + (ty * dy),
-                (tx * dy) - (ty * dx));
+                (tx * dy) - (ty * dx),
+                (tx * dx) + (ty * dy));
     }
 
     public Position addRobotRel(Point p) {

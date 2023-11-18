@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 @Autonomous
 public class AutoOpMode extends LinearOpMode {
 
-    double gearRatio = 40;
+    double gearRatio = 20;
 
     Positioning posn;
 
@@ -53,7 +53,7 @@ public class AutoOpMode extends LinearOpMode {
         waitForStart();
 
         posn = new Positioning(IMU);
-        currentPos = new Position(12, 36, 0, 1, 0);
+        currentPos = new Position(8.5, 36, 0, 1, 0);
 
         telemetry.addData("heading", posn.getHeading());
         telemetry.update();
@@ -62,17 +62,33 @@ public class AutoOpMode extends LinearOpMode {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
-        strafeToClosestPoint(new Point(15, 36));
+        strafeToClosestPoint(new Point(11.75, 36));
+        pause();
+        rotateToHeading(0);
+        pause();
+        driveToClosestPoint(new Point(11.75, 96));
+        pause();
+        rotateToHeading(0);
+        pause();
+        strafeToClosestPoint(new Point(36, 96));
+        pause();
+        rotateToHeading(0);
+        pause();
+        driveToClosestPoint(new Point(36, 120.5));
+        pause();
+        rotateToHeading(0);
+        pause();
+        driveToClosestPoint(new Point(36, 120.5));
+        pause();
+        rotateToHeading(0);
+        pause();
+    }
+
+    private void pause() {
+        telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
+        telemetry.update();
+
         sleep(2000);
-        driveToClosestPoint(new Point(15, 76));
-        sleep(200);
-        strafeToClosestPoint(new Point(31, 76));
-        sleep(200);
-        driveToClosestPoint(new Point(31, 81));
-        sleep(200);
-        driveToClosestPoint(new Point(31, 76));
-        sleep(200);
-        rotateToHeading(180);
     }
 
     private void driveToClosestPoint(Point target) {
@@ -94,6 +110,9 @@ public class AutoOpMode extends LinearOpMode {
                 if (Math.abs(targetDist) < 0.1) {
                     break;
                 }
+
+                telemetry.addData("drive", targetDist);
+                telemetry.update();
 
                 updatedPos = currentPos.addRobotRel(new Point(0, targetDist));
 
@@ -124,6 +143,7 @@ public class AutoOpMode extends LinearOpMode {
                 break;
             }
         }
+
         if (updatedPos != null) {
             this.currentPos = updatedPos;
         }
@@ -148,6 +168,9 @@ public class AutoOpMode extends LinearOpMode {
                 if (Math.abs(targetDist) < 0.1) {
                     break;
                 }
+
+                telemetry.addData("strafe", targetDist);
+                telemetry.update();
 
                 updatedPos = currentPos.addRobotRel(new Point(targetDist, 0));
 
@@ -209,8 +232,9 @@ public class AutoOpMode extends LinearOpMode {
                 int targetPos = (int) (targetAngle * ppd);
                 double power = 0.5;
 
-                telemetry.addData("target pos", targetPos);
+                telemetry.addData("rotate", targetAngle);
                 telemetry.update();
+
 
                 for (DcMotor m : motors) {
                     int p = m.getCurrentPosition();

@@ -22,6 +22,7 @@ public class Positioning {
     private double intialHeading;
     private final double[] allmx = {29.381, 35.381, 41.381, 100.0435, 106.0435, 112.0435};
     private final double[] allmy = {132.492908, 132.492908, 132.492908, 132.492908, 132.492908, 132.492908, 0, 0, 0, 0};
+    private final double camOffsetX = 5.25, camOffsetY = 8;
 
     public Positioning(BNO055IMUNew IMU) {
         this.IMU = IMU;
@@ -57,7 +58,11 @@ public class Positioning {
                 double mx = allmx[i];
                 double my = allmy[i];
 
-                double mc = Math.sqrt((detection.ftcPose.x * detection.ftcPose.x) + (detection.ftcPose.y * detection.ftcPose.y));
+
+                double px=detection.ftcPose.x-camOffsetX;
+                double py=detection.ftcPose.y-camOffsetY;
+
+                double mc = Math.sqrt((px * px) + (py * py));
 
                 double a = getHeading();
                 double dx = Math.sin(Math.toRadians(detection.ftcPose.yaw));
