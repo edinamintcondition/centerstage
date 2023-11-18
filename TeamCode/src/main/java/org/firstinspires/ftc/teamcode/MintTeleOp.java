@@ -4,13 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import parts.MintArm;
-import parts.MintCamera;
 import parts.MintWheels;
 import parts.MintGrabber;
 import parts.MintWrist;
 
-@TeleOp
-public class RobotOpMode extends LinearOpMode {
+@TeleOp(name = "Mint TeleOp", group = "A")
+public class MintTeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -19,11 +18,8 @@ public class RobotOpMode extends LinearOpMode {
 
         //Gamepad 2
         MintArm arm = new MintArm(hardwareMap, gamepad2, telemetry);
-        MintWrist wrist = new MintWrist(hardwareMap, gamepad2, telemetry);
         MintGrabber grabber = new MintGrabber(hardwareMap, gamepad2, telemetry);
-
-        //Camera
-        MintCamera camera  = new MintCamera(hardwareMap,  telemetry);
+        MintWrist wrist = new MintWrist(hardwareMap, gamepad2, telemetry, grabber);
 
         //Start OpMode
         waitForStart();
@@ -43,18 +39,8 @@ public class RobotOpMode extends LinearOpMode {
             grabber.run();
             grabber.printPosition();
 
-            camera.run();
-
             telemetry.update();
 
-            // Save CPU resources; can resume streaming when needed.
-            if (gamepad2.dpad_down) {
-                camera.stopStreaming();
-            } else if (gamepad2.dpad_up) {
-                camera.resumeStreaming();
-            }
-
-            sleep(20);
         }
     }
 }

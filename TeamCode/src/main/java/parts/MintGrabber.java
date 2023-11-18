@@ -1,8 +1,5 @@
 package parts;
 
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -13,8 +10,9 @@ public class MintGrabber {
 
     //Constants
     String servoName = "grab_servo";
-    final double FINAL_POSITION = 0.25;
-    final double START_POSITION = 0;
+    final double FINAL_POSITION = 0.95;
+    final double START_POSITION = 0.4;
+
 
     //Variables
     Servo myServo;
@@ -35,11 +33,11 @@ public class MintGrabber {
         String pressedButton = null;
         // move servo
         if (gamepad.left_bumper) {
-            pressedButton = "left";
-            rotateClock(); // rotate clockwise;
+            pressedButton = "left bumper";
+            closeGrab(); // rotate clockwise;
         } else if (gamepad.right_bumper) {
-            pressedButton = "right";
-            rotateCounterClock(); // rotate counterclockwise
+            pressedButton = "right bumper";
+            openGrab(); // rotate counterclockwise
 //        } else {
             //          stop(); // stops rotation
             //        pressedButton = "nothing";
@@ -48,17 +46,18 @@ public class MintGrabber {
         telemetry.addData(">", pressedButton + " is pressed :D");
     }
 
-    public void rotateClock() {
+    public void closeGrab() {
         myServo.setPosition(FINAL_POSITION); // rotate clockwise
+        telemetry.addData(">", "GRAB CLOSED GRRRR");
     }
 
-    public void rotateCounterClock() {
+    public void openGrab() {
         myServo.setPosition(START_POSITION); // rotate counterclockwise
+        telemetry.addData(">", "GRAB OPEN COACH");
     }
-
 
     public void printPosition() {
-        telemetry.addData("Servo Position", "%5.2f", myServo.getPosition());
+        telemetry.addData("Grabber " + myServo.getDeviceName(), myServo.getPosition());
     }
 
     public void stop() {

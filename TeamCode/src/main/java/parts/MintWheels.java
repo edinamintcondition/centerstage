@@ -11,10 +11,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.Positioning;
-import org.firstinspires.ftc.teamcode.Position;
-import org.firstinspires.ftc.vision.VisionPortal;
+
 
 public class MintWheels {
     // Constants
@@ -57,22 +54,40 @@ public class MintWheels {
         double lateral = gamepad.left_stick_x;
         double yaw = gamepad.right_stick_x;
 
-        double powerLimit = 0.6;
+        //Calculates the wheel direction
+        double leftFrontPower = axial + lateral + yaw;
+        double leftBackPower = axial - lateral + yaw;
+        double rightFrontPower = axial - lateral - yaw;
+        double rightBackPower = axial + lateral - yaw;
+
+        double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
+        double min = min(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
+
+
         if (gamepad.right_bumper) {
-            powerLimit = 1;
+            forwardPowerLimit = 1.0;
+            backwardPowerLimit = -1;
             telemetry.addData(">", "TURBO LETS GOOOO");
         } else if (gamepad.left_bumper) {
-            powerLimit = 0.3;
-            telemetry.addData( ">", "slow speed :b");
+            forwardPowerLimit = 0.2;
+            backwardPowerLimit = -0.2;
+            telemetry.addData(">", "SLOOOW DOWN MATE");
+        } else {
+            forwardPowerLimit = 0.6;
+            backwardPowerLimit = -0.6;
+            telemetry.addData(">", "normal speed :b");
         }
 
-        runAny(axial, lateral, yaw, powerLimit);
+        controlWheel("Left Front", leftFront, leftFrontPower, max, min);
+        controlWheel("Right Front", rightFront, rightFrontPower, max, min);
+        controlWheel("Left Back", leftBack, leftBackPower, max, min);
+        controlWheel("Right Back", rightBack, rightBackPower, max, min);
     }
 
-    private void controlWheel(DcMotor motor, double tgtPower, double maxPower, double minPower) {
+    private void controlWheel(String name, DcMotor motor, double tgtPower, double maxPower, double minPower) {
         if (maxPower > forwardPowerLimit) {
             tgtPower *= forwardPowerLimit / maxPower;
-        } else if (minPower > backwardPowerLimit) {
+        } else if (minPower < backwardPowerLimit) {
             tgtPower *= backwardPowerLimit / minPower;
         }
 
@@ -80,7 +95,7 @@ public class MintWheels {
         motor.setPower(tgtPower);
 
 
-        telemetry.addData(motor.getDeviceName(), tgtPower);
+        telemetry.addData(">", name + " motor: ", tgtPower);
     }
 
     public void setNavigation() {
