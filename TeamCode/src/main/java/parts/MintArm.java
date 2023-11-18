@@ -2,6 +2,8 @@ package parts;
 
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 
+import static java.lang.Math.abs;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,8 +14,8 @@ public class MintArm {
 
     // Constants
     String motorName = "arm_motor";
-    //Sets power to 50%
-    double powerLimit = 0.5;
+    //Sets power to 40%
+    double normPower = 0.4;
 
     // Variables
     Gamepad gamepad;
@@ -30,23 +32,11 @@ public class MintArm {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry = aTelemetry;
-
-        if (gamepad.left_trigger > 0.8) {
-            powerLimit = 1.0;
-            telemetry.addData(">", "STRONGARM HAHAHA");
-        } else {
-            powerLimit = 0.5;
-            telemetry.addData(">", "normal arm power");
-        }
     }
 
     //Methods
     public void run() {
-        // move arm with left joystick on gamepad 2
-        double tgtPower = -gamepad.left_stick_y * powerLimit;
-        armMotor.setPower(tgtPower);
 
-        telemetry.addData(armMotor.getDeviceName(), tgtPower);
         /* This code *literally* breaks the robot but would work with a stronger wrist servo
         if (isStrongArm || gamepad.right_trigger > 0.8) {
             armMotor.setPower(1.00);
@@ -60,6 +50,14 @@ public class MintArm {
             }
         } else {
          */
+        double armPower = -gamepad.left_stick_y * normPower;
+        telemetry.addData(">", "normal arm power D':");
+
+        // move motor
+        armMotor.setPower(armPower);
+
+        telemetry.addData("Arm " + armMotor.getDeviceName(), armPower);
+//        }
     }
 
 }
