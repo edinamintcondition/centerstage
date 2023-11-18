@@ -11,10 +11,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.AprilTagPositioning;
-import org.firstinspires.ftc.teamcode.Position;
-import org.firstinspires.ftc.vision.VisionPortal;
+
 
 public class MintWheels {
     // Constants
@@ -59,8 +56,8 @@ public class MintWheels {
 
         //Calculates the wheel direction
         double leftFrontPower = axial + lateral + yaw;
-        double rightFrontPower = axial - lateral - yaw;
         double leftBackPower = axial - lateral + yaw;
+        double rightFrontPower = axial - lateral - yaw;
         double rightBackPower = axial + lateral - yaw;
 
         double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
@@ -70,10 +67,14 @@ public class MintWheels {
             forwardPowerLimit = 1.0;
             backwardPowerLimit = -1.0;
             telemetry.addData(">", "TURBO LETS GOOOO");
+        } else if (gamepad.left_bumper) {
+            forwardPowerLimit = 0.2;
+            backwardPowerLimit = -0.2;
+            telemetry.addData(">", "SLOOOW DOWN MATE");
         } else {
             forwardPowerLimit = 0.6;
             backwardPowerLimit = -0.6;
-            telemetry.addData( ">", "normal speed :b");
+            telemetry.addData(">", "normal speed :b");
         }
 
         controlWheel("Left Front", leftFront, leftFrontPower, max, min);
@@ -82,10 +83,10 @@ public class MintWheels {
         controlWheel("Right Back", rightBack, rightBackPower, max, min);
     }
 
-    private void controlWheel(DcMotor motor, double tgtPower, double maxPower, double minPower) {
+    private void controlWheel(String name, DcMotor motor, double tgtPower, double maxPower, double minPower) {
         if (maxPower > forwardPowerLimit) {
             tgtPower *= forwardPowerLimit / maxPower;
-        } else if (minPower > backwardPowerLimit) {
+        } else if (minPower < backwardPowerLimit) {
             tgtPower *= backwardPowerLimit / minPower;
         }
 
