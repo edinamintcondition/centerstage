@@ -9,8 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous
-public class AutoOpMode extends LinearOpMode {
+public abstract class AutoOpMode extends LinearOpMode {
 
     double gearRatio = 20;
 
@@ -19,6 +18,11 @@ public class AutoOpMode extends LinearOpMode {
     Position currentPos;
 
     DcMotor[] motors, revMotors, fwdMotors;
+
+    public AutoOpMode(Position initPos) {
+        currentPos = initPos;
+    }
+    public abstract void driveToBackboard();
 
     @Override
     public void runOpMode() {
@@ -53,7 +57,6 @@ public class AutoOpMode extends LinearOpMode {
         waitForStart();
 
         posn = new Positioning(IMU);
-        currentPos = new Position(8.5, 36, 0, 1, 0);
 
         telemetry.addData("heading", posn.getHeading());
         telemetry.update();
@@ -62,36 +65,17 @@ public class AutoOpMode extends LinearOpMode {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
-        strafeToClosestPoint(new Point(11.75, 36));
-        pause();
-        rotateToHeading(0);
-        pause();
-        driveToClosestPoint(new Point(11.75, 96));
-        pause();
-        rotateToHeading(0);
-        pause();
-        strafeToClosestPoint(new Point(36, 96));
-        pause();
-        rotateToHeading(0);
-        pause();
-        driveToClosestPoint(new Point(36, 120.5));
-        pause();
-        rotateToHeading(0);
-        pause();
-        driveToClosestPoint(new Point(36, 120.5));
-        pause();
-        rotateToHeading(0);
-        pause();
+        driveToBackboard();
     }
 
-    private void pause() {
+    public void pause() {
         telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
         telemetry.update();
 
-        sleep(2000);
+        sleep(100);
     }
 
-    private void driveToClosestPoint(Point target) {
+    public void driveToClosestPoint(Point target) {
         double ppi = 537.0 * 5 / 60.875;
         ppi = ppi * (gearRatio / 20);
         double fastLimit = 10;
@@ -149,7 +133,7 @@ public class AutoOpMode extends LinearOpMode {
         }
     }
 
-    private void strafeToClosestPoint(Point target) {
+    public void strafeToClosestPoint(Point target) {
         double fastLimit = 10;
         double ppi = 50.09;
         ppi = ppi * (gearRatio / 20);
@@ -214,7 +198,7 @@ public class AutoOpMode extends LinearOpMode {
         }
     }
 
-    private void rotateToHeading(double targetHeading) {
+    public void rotateToHeading(double targetHeading) {
         double ppd = 537.0 / 63.15;
         ppd = ppd * (gearRatio / 20);
 
@@ -253,7 +237,7 @@ public class AutoOpMode extends LinearOpMode {
         }
     }
 
-    private boolean areIdle() {
+    public boolean areIdle() {
         for (DcMotor m : motors) {
             if (m.isBusy()) {
                 return false;
