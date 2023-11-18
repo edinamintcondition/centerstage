@@ -1,7 +1,5 @@
 package parts;
 
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
-
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,22 +10,25 @@ public class MintWrist {
 
     // Constants
     String servoName = "wrist_servo";
-    final double FINAL_POSITION = 1;
-    final double START_POSITION = 0;
-    final double FLAT = 0.7;
+    final double FINAL_POSITION = 0.95;
+    final double ZERO_POSITION = 0;
+    final double FLAT_POSITION = 0.7;
 
     // Variables
     Gamepad gamepad;
     Telemetry telemetry;
+    MintGrabber grabber;
     Servo myServo;
 
     // Constructor
-    public MintWrist(HardwareMap hardwareMap, Gamepad gamepadToUse, Telemetry aTelemetry) {
+    public MintWrist(HardwareMap hardwareMap, Gamepad gamepadToUse, Telemetry aTelemetry, MintGrabber aGrabber) {
         gamepad = gamepadToUse;
 
         myServo = hardwareMap.get(Servo.class, servoName);
 
         telemetry = aTelemetry;
+
+        grabber = aGrabber;
     }
 
     //Methods
@@ -35,24 +36,28 @@ public class MintWrist {
         String pressedButton = "nothing";
         // move servo
         if (gamepad.a) {
+            grabber.closeGrab();
             pressedButton = "'a'";
             positionTwo(); // fully extend
         } else if (gamepad.b) {
+            grabber.closeGrab();
             pressedButton = "'b'";
             positionZero(); // retract
         } else if (gamepad.x) {
+            grabber.closeGrab();
             pressedButton = "'x'";
             positionOne(); // extend until flat with the ground
-        } else if (gamepad.y)
+        } else if (gamepad.y) {
             pressedButton = "'y'";
+        }
 
         telemetry.addData(">", pressedButton + " is pressed :D");
-        telemetry.addData("Servo position:", myServo.getPosition());
+        telemetry.addData("Wrist Servo position:", myServo.getPosition());
     }
 
 
     public void positionZero() {
-        myServo.setPosition(START_POSITION); // retracts
+        myServo.setPosition(ZERO_POSITION); // retracts
         telemetry.addData(">","wrist in..");
     }
 
@@ -62,7 +67,7 @@ public class MintWrist {
     }
 
     public void positionTwo() {
-        myServo.setPosition(FLAT); // Is parallel to the floor when are is fully down
+        myServo.setPosition(FLAT_POSITION); // Is parallel to the floor when are is fully down
         telemetry.addData(">","wrist flat");
     }
 
