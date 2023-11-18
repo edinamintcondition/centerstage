@@ -76,10 +76,10 @@ public class MintWheels {
             telemetry.addData( ">", "normal speed :b");
         }
 
-        controlWheel(leftFront, leftFrontPower, max, min);
-        controlWheel(rightFront, rightFrontPower, max, min);
-        controlWheel(leftBack, leftBackPower, max, min);
-        controlWheel(rightBack, rightBackPower, max, min);
+        controlWheel("Left Front", leftFront, leftFrontPower, max, min);
+        controlWheel("Right Front", rightFront, rightFrontPower, max, min);
+        controlWheel("Left Back", leftBack, leftBackPower, max, min);
+        controlWheel("Right Back", rightBack, rightBackPower, max, min);
     }
 
     private void controlWheel(DcMotor motor, double tgtPower, double maxPower, double minPower) {
@@ -93,7 +93,7 @@ public class MintWheels {
         motor.setPower(tgtPower);
 
 
-        telemetry.addData(motor.getDeviceName(), tgtPower);
+        telemetry.addData(">", name + " motor: ", tgtPower);
     }
 
     public void setNavigation() {
