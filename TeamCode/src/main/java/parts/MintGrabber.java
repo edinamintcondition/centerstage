@@ -13,6 +13,7 @@ public class MintGrabber {
     final double FINAL_POSITION = 0.95;
     final double START_POSITION = 0.4;
 
+
     //Variables
     Servo myServo;
     Gamepad gamepad;

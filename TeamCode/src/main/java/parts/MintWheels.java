@@ -63,9 +63,9 @@ public class MintWheels {
         double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
         double min = min(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
 
+
         if (gamepad.right_bumper) {
-            forwardPowerLimit = 1.0;
-            backwardPowerLimit = -1.0;
+            powerLimit = 1;
             telemetry.addData(">", "TURBO LETS GOOOO");
         } else if (gamepad.left_bumper) {
             forwardPowerLimit = 0.2;
