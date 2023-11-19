@@ -22,6 +22,7 @@ public abstract class AutoOpMode extends LinearOpMode {
     public AutoOpMode(Position initPos) {
         currentPos = initPos;
     }
+
     public abstract void driveToBackboard();
 
     @Override
@@ -95,6 +96,8 @@ public abstract class AutoOpMode extends LinearOpMode {
                     break;
                 }
 
+                if (newCurPos != null)
+                    telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
                 telemetry.addData("drive", targetDist);
                 telemetry.update();
 
@@ -115,10 +118,10 @@ public abstract class AutoOpMode extends LinearOpMode {
                     m.setPower(power);
                     m.setMode(RUN_TO_POSITION);
                 }
+            }
 
-                if (areIdle()) { // shouldn't really happen
-                    break;
-                }
+            if (areIdle()) { // shouldn't really happen
+                break;
             }
         }
 
@@ -153,6 +156,8 @@ public abstract class AutoOpMode extends LinearOpMode {
                     break;
                 }
 
+                if (newCurPos != null)
+                    telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
                 telemetry.addData("strafe", targetDist);
                 telemetry.update();
 
