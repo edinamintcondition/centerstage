@@ -9,6 +9,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 public abstract class AutoOpMode extends LinearOpMode {
 
@@ -24,15 +28,18 @@ public abstract class AutoOpMode extends LinearOpMode {
         currentPos = initPos;
     }
 
-    public abstract void driveToBackboard();
-
     @Override
     public void runOpMode() {
         DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "front_left_motor");
         DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "front_right_motor");
         DcMotorEx leftBack = hardwareMap.get(DcMotorEx.class, "back_left_motor");
         DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "back_right_motor");
-        BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "IMU");
+        BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "imu");
+
+        posn = new Positioning(IMU, telemetry);
+
+//        WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+//        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, posn.myAprilTagProc);
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -56,19 +63,18 @@ public abstract class AutoOpMode extends LinearOpMode {
                 rightFront
         };
 
-        waitForStart();
-
-        posn = new Positioning(IMU);
-
-        telemetry.addData("heading", posn.getHeading());
-        telemetry.update();
-
-        for (DcMotor m : motors) {
+        for (DcMotorEx m : motors) {
+            PIDFCoefficients c = m.getPIDFCoefficients(RUN_TO_POSITION);
+            m.setPIDFCoefficients(RUN_TO_POSITION, c);
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
+        waitForStart();
+
         driveToBackboard();
     }
+
+    public abstract void driveToBackboard();
 
     public void pause() {
         telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
@@ -78,7 +84,7 @@ public abstract class AutoOpMode extends LinearOpMode {
     }
 
     public void driveToClosestPoint(Point target) {
-        double ppi = 537.0 * 5 / 60.875;
+        double ppi = 537.0 * 5 / 55.9;
         ppi = ppi * (gearRatio / 20);
         double fastLimit = 10;
 
@@ -100,19 +106,12 @@ public abstract class AutoOpMode extends LinearOpMode {
                 if (newCurPos != null)
                     telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
                 telemetry.addData("drive", targetDist);
-                telemetry.update();
                 pause();
 
                 updatedPos = currentPos.addRobotRel(new Point(0, targetDist));
 
                 int targetPos = (int) (targetDist * ppi);
-                double power;
-
-                if (targetDist > fastLimit) {
-                    power = 1;
-                } else {
-                    power = .25;
-                }
+                double power = 0.5;
 
                 for (DcMotor m : motors) {
                     int p = m.getCurrentPosition();
@@ -140,7 +139,7 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     public void strafeToClosestPoint(Point target) {
         double fastLimit = 10;
-        double ppi = 50.09;
+        double ppi = 58;
         ppi = ppi * (gearRatio / 20);
 
         Position updatedPos = null;
@@ -161,19 +160,12 @@ public abstract class AutoOpMode extends LinearOpMode {
                 if (newCurPos != null)
                     telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
                 telemetry.addData("strafe", targetDist);
-                telemetry.update();
                 pause();
 
                 updatedPos = currentPos.addRobotRel(new Point(targetDist, 0));
 
                 int targetPos = (int) (targetDist * ppi);
-                double power;
-
-                if (targetDist > fastLimit) {
-                    power = 1;
-                } else {
-                    power = .3;
-                }
+                double power = 0.5;
 
                 for (DcMotor m : fwdMotors) {
                     int p = m.getCurrentPosition();

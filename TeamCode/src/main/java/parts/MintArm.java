@@ -15,7 +15,7 @@ public class MintArm {
     // Constants
     String motorName = "arm_motor";
     //Sets power to 40%
-    double normPower = 0.4;
+    double normPower = 0.5;
 
     // Variables
     Gamepad gamepad;
@@ -56,7 +56,7 @@ public class MintArm {
         // move motor
         armMotor.setPower(armPower);
 
-        telemetry.addData("Arm " + armMotor.getDeviceName(), armPower);
+        telemetry.addData("Arm " + armMotor.getDeviceName(), "%f %d", armPower, armMotor.getCurrentPosition());
 //        }
     }
 

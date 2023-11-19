@@ -18,7 +18,5 @@ public class AutoOpModeBlueFront extends AutoOpMode {
         rotateToHeading(0);
         driveToClosestPoint(new Point(36, 120.5));
         rotateToHeading(0);
-        driveToClosestPoint(new Point(36, 120.5));
-        rotateToHeading(0);
     }
 }
