@@ -4,7 +4,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 import com.qualcomm.hardware.bosch.BNO055IMUNew;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -16,9 +15,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 
+import parts.MintGrabber;
+import parts.MintWrist;
+
 public abstract class AutoOpMode extends LinearOpMode {
 
     double gearRatio = 20;
+    boolean useAprilTags;
 
     Positioning posn;
 
@@ -31,6 +34,9 @@ public abstract class AutoOpMode extends LinearOpMode {
     Servo wristServo;
 
     Servo grabServo;
+
+    protected final static double frontStartX = 8, backStartX = 8.5, frontCentralX = 56, backboardX = 36;
+    protected final static double frontStartY = 34, backStartY = 84, approachY = 114;
 
     public AutoOpMode(Position initPos) {
         currentPos = initPos;
@@ -50,8 +56,8 @@ public abstract class AutoOpMode extends LinearOpMode {
 
         posn = new Positioning(IMU, telemetry);
 
-//        WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
-//        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, posn.myAprilTagProc);
+        WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, posn.myAprilTagProc);
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -74,17 +80,67 @@ public abstract class AutoOpMode extends LinearOpMode {
 
         waitForStart();
 
+        posn.resetPosition();
+        grabServo.setPosition(MintGrabber.FINAL_POSITION);
+
         driveToBackboard();
         pause();
+
+        Position p = posn.getRelPosition(currentPos);
+        if (useAprilTags && p != null) {
+            telemetry.addData("see april tag", "to drop pixel");
+            telemetry.update();
+
+            sleep(500);
+
+            Point tgt = new Point(p.x, p.y - 10);
+            strafeToClosestPoint(tgt);
+            pause();
+            driveToClosestPoint(tgt);
+        } else {
+            Point tgt = new Point(currentPos.x, currentPos.y + 9);
+            driveToClosestPoint(tgt);
+        }
+        pause();
+
         dropPixel();
+        retractArm();
+        pause();
+        park();
     }
 
     public abstract void driveToBackboard();
 
+    public abstract void park();
+
+    public void retractArm() {
+        wristServo.setPosition(0.1);
+        grabServo.setPosition(0.95);
+
+        ElapsedTime t = new ElapsedTime();
+        t.reset();
+
+        while (opModeIsActive()) {
+            if (t.milliseconds() < 2000) {
+                armMotor.setTargetPosition(-370);
+                armMotor.setPower(.5);
+                armMotor.setMode(RUN_TO_POSITION);
+                sleep(1);
+            } else if (t.milliseconds() > 3000) {
+                break;
+            } else {
+                armMotor.setTargetPosition(-100);
+                armMotor.setPower(.5);
+                armMotor.setMode(RUN_TO_POSITION);
+                sleep(1);
+            }
+        }
+    }
+
     public void dropPixel() {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        wristServo.setPosition(0.65);
+        wristServo.setPosition(0.75);
 
         ElapsedTime t = new ElapsedTime();
         t.reset();
@@ -95,19 +151,10 @@ public abstract class AutoOpMode extends LinearOpMode {
             }
 
             if (t.milliseconds() > 5000) {
-                wristServo.setPosition(0);
-                grabServo.setPosition(0.95);
                 break;
             }
 
-            armMotor.setTargetPosition(-400);
-            armMotor.setPower(.5);
-            armMotor.setMode(RUN_TO_POSITION);
-            sleep(1);
-        }
-
-        while (opModeIsActive()) {
-            armMotor.setTargetPosition(-400);
+            armMotor.setTargetPosition(-370);
             armMotor.setPower(.5);
             armMotor.setMode(RUN_TO_POSITION);
             sleep(1);
@@ -177,7 +224,7 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     public void strafeToClosestPoint(Point target) {
         double fastLimit = 10;
-        double ppi = 58;
+        double ppi = 56;
         ppi = ppi * (gearRatio / 20);
 
         Position updatedPos = null;

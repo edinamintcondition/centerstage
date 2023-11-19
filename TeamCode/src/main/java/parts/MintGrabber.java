@@ -10,7 +10,7 @@ public class MintGrabber {
 
     //Constants
     String servoName = "grab_servo";
-    final double FINAL_POSITION = 0.95;
+    public static final double FINAL_POSITION = 0.96;
     final double START_POSITION = 0.4;
 
 

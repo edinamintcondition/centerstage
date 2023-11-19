@@ -10,9 +10,9 @@ public class MintWrist {
 
     // Constants
     String servoName = "wrist_servo";
-    final double FINAL_POSITION = 0.95;
-    final double ZERO_POSITION = 0;
-    final double FLAT_POSITION = 0.65;
+    public static final double FINAL_POSITION = 0.95;
+    public static final double ZERO_POSITION = 0;
+    public static final double FLAT_POSITION = 0.65;
 
     // Variables
     Gamepad gamepad;

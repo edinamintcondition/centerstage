@@ -6,17 +6,21 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class AutoOpModeRedFront extends AutoOpMode {
 
     public AutoOpModeRedFront() {
-        super(new Position(144 - 8.5, 36, 0, 1, 0));
+        super(new Position(144 - frontStartX, frontStartY, 0, 1, 0));
     }
 
     public void driveToBackboard() {
-        strafeToClosestPoint(new Point(144 - 11.75, 36));
+        strafeToClosestPoint(new Point(144 - frontCentralX, frontStartY));
         rotateToHeading(0);
-        driveToClosestPoint(new Point(144 - 11.75, 96));
+        driveToClosestPoint(new Point(144 - frontCentralX, approachY));
         rotateToHeading(0);
-        strafeToClosestPoint(new Point(144 - 36, 96));
+        strafeToClosestPoint(new Point(144 - backboardX, approachY));
         rotateToHeading(0);
-        driveToClosestPoint(new Point(144 - 36, 120.5));
-        rotateToHeading(0);
+    }
+
+    public void park() {
+        Point p = new Point(currentPos.x + 12, currentPos.y - 6);
+        driveToClosestPoint(p);
+        strafeToClosestPoint(p);
     }
 }
