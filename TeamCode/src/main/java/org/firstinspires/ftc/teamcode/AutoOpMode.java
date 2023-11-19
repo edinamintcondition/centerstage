@@ -90,15 +90,23 @@ public abstract class AutoOpMode extends LinearOpMode {
         t.reset();
 
         while (opModeIsActive()) {
-            if (t.milliseconds() > 5000) {
+            if (t.milliseconds() > 4000) {
                 grabServo.setPosition(0.4);
             }
 
-            if (t.milliseconds() > 6000) {
+            if (t.milliseconds() > 5000) {
                 wristServo.setPosition(0);
-                grabServo.setPosition(0);
+                grabServo.setPosition(0.95);
+                break;
             }
 
+            armMotor.setTargetPosition(-400);
+            armMotor.setPower(.5);
+            armMotor.setMode(RUN_TO_POSITION);
+            sleep(1);
+        }
+
+        while (opModeIsActive()) {
             armMotor.setTargetPosition(-400);
             armMotor.setPower(.5);
             armMotor.setMode(RUN_TO_POSITION);
