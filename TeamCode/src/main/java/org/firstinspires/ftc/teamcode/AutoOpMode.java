@@ -7,6 +7,7 @@ import com.qualcomm.hardware.bosch.BNO055IMUNew;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public abstract class AutoOpMode extends LinearOpMode {
@@ -17,7 +18,7 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     Position currentPos;
 
-    DcMotor[] motors, revMotors, fwdMotors;
+    DcMotorEx[] motors, revMotors, fwdMotors;
 
     public AutoOpMode(Position initPos) {
         currentPos = initPos;
@@ -27,10 +28,10 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        DcMotor leftFront = hardwareMap.get(DcMotor.class, "front_left_motor");
-        DcMotor rightFront = hardwareMap.get(DcMotor.class, "front_right_motor");
-        DcMotor leftBack = hardwareMap.get(DcMotor.class, "back_left_motor");
-        DcMotor rightBack = hardwareMap.get(DcMotor.class, "back_right_motor");
+        DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "front_left_motor");
+        DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "front_right_motor");
+        DcMotorEx leftBack = hardwareMap.get(DcMotorEx.class, "back_left_motor");
+        DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "back_right_motor");
         BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "IMU");
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -38,19 +39,19 @@ public abstract class AutoOpMode extends LinearOpMode {
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motors = new DcMotor[]{
+        motors = new DcMotorEx[]{
                 leftFront,
                 leftBack,
                 rightFront,
                 rightBack
         };
 
-        fwdMotors = new DcMotor[]{
+        fwdMotors = new DcMotorEx[]{
                 leftFront,
                 rightBack
         };
 
-        revMotors = new DcMotor[]{
+        revMotors = new DcMotorEx[]{
                 leftBack,
                 rightFront
         };
@@ -100,6 +101,7 @@ public abstract class AutoOpMode extends LinearOpMode {
                     telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
                 telemetry.addData("drive", targetDist);
                 telemetry.update();
+                pause();
 
                 updatedPos = currentPos.addRobotRel(new Point(0, targetDist));
 
@@ -160,6 +162,7 @@ public abstract class AutoOpMode extends LinearOpMode {
                     telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
                 telemetry.addData("strafe", targetDist);
                 telemetry.update();
+                pause();
 
                 updatedPos = currentPos.addRobotRel(new Point(targetDist, 0));
 
