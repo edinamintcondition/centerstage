@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -24,6 +26,12 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     DcMotorEx[] motors, revMotors, fwdMotors;
 
+    DcMotorEx armMotor;
+
+    Servo wristServo;
+
+    Servo grabServo;
+
     public AutoOpMode(Position initPos) {
         currentPos = initPos;
     }
@@ -34,7 +42,11 @@ public abstract class AutoOpMode extends LinearOpMode {
         DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "front_right_motor");
         DcMotorEx leftBack = hardwareMap.get(DcMotorEx.class, "back_left_motor");
         DcMotorEx rightBack = hardwareMap.get(DcMotorEx.class, "back_right_motor");
+        armMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
         BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "imu");
+        wristServo = hardwareMap.get(Servo.class, "wrist_servo");
+        grabServo = hardwareMap.get(Servo.class, "grab_servo");
+
 
         posn = new Positioning(IMU, telemetry);
 
@@ -46,22 +58,11 @@ public abstract class AutoOpMode extends LinearOpMode {
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motors = new DcMotorEx[]{
-                leftFront,
-                leftBack,
-                rightFront,
-                rightBack
-        };
+        motors = new DcMotorEx[]{leftFront, leftBack, rightFront, rightBack};
 
-        fwdMotors = new DcMotorEx[]{
-                leftFront,
-                rightBack
-        };
+        fwdMotors = new DcMotorEx[]{leftFront, rightBack};
 
-        revMotors = new DcMotorEx[]{
-                leftBack,
-                rightFront
-        };
+        revMotors = new DcMotorEx[]{leftBack, rightFront};
 
         for (DcMotorEx m : motors) {
             PIDFCoefficients c = m.getPIDFCoefficients(RUN_TO_POSITION);
@@ -69,12 +70,41 @@ public abstract class AutoOpMode extends LinearOpMode {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
+        armMotor.setMode(STOP_AND_RESET_ENCODER);
+
         waitForStart();
 
         driveToBackboard();
+        pause();
+        dropPixel();
     }
 
     public abstract void driveToBackboard();
+
+    public void dropPixel() {
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        wristServo.setPosition(0.65);
+
+        ElapsedTime t = new ElapsedTime();
+        t.reset();
+
+        while (opModeIsActive()) {
+            if (t.milliseconds() > 5000) {
+                grabServo.setPosition(0.4);
+            }
+
+            if (t.milliseconds() > 6000) {
+                wristServo.setPosition(0);
+                grabServo.setPosition(0);
+            }
+
+            armMotor.setTargetPosition(-400);
+            armMotor.setPower(.5);
+            armMotor.setMode(RUN_TO_POSITION);
+            sleep(1);
+        }
+    }
 
     public void pause() {
         telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
