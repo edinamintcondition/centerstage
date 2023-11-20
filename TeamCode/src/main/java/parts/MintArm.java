@@ -50,7 +50,7 @@ public class MintArm {
             }
         } else {
          */
-        double armPower = -gamepad.left_stick_y * normPower;
+        double armPower = gamepad.left_stick_y * normPower;
         telemetry.addData(">", "normal arm power D':");
 
         // move motor

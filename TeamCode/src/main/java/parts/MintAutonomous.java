@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package parts;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
@@ -12,20 +12,20 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.teamcode.Point;
+import org.firstinspires.ftc.teamcode.Position;
+import org.firstinspires.ftc.teamcode.Positioning;
 
 import parts.MintGrabber;
-import parts.MintWrist;
 
-public abstract class AutoOpMode extends LinearOpMode {
+public abstract class MintAutonomous extends LinearOpMode {
 
     double gearRatio = 20;
     boolean useAprilTags;
 
     Positioning posn;
 
-    Position currentPos;
+    protected Position currentPos;
 
     DcMotorEx[] motors, revMotors, fwdMotors;
 
@@ -35,10 +35,10 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     Servo grabServo;
 
-    protected final static double frontStartX = 8, backStartX = 8.5, frontCentralX = 56, backboardX = 36;
-    protected final static double frontStartY = 34, backStartY = 84, approachY = 114;
+    protected final static double frontStartX = 4, backStartX = 8.5, frontCentralX = frontStartX + 50, backboardX = 36;
+    protected final static double frontStartY = 32, backStartY = 84, approachY = 112;
 
-    public AutoOpMode(Position initPos) {
+    public MintAutonomous(Position initPos) {
         currentPos = initPos;
     }
 
@@ -52,12 +52,14 @@ public abstract class AutoOpMode extends LinearOpMode {
         BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "imu");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         grabServo = hardwareMap.get(Servo.class, "grab_servo");
-
+        //MintGrabber.init(grabServo);
 
         posn = new Positioning(IMU, telemetry);
 
+        /*
         WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
         VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, posn.myAprilTagProc);
+        */
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -81,7 +83,7 @@ public abstract class AutoOpMode extends LinearOpMode {
         waitForStart();
 
         posn.resetPosition();
-        grabServo.setPosition(MintGrabber.FINAL_POSITION);
+        //grabServo.setPosition(MintGrabber.CLOSED_POSITION);
 
         driveToBackboard();
         pause();
@@ -93,12 +95,12 @@ public abstract class AutoOpMode extends LinearOpMode {
 
             sleep(500);
 
-            Point tgt = new Point(p.x, p.y - 10);
+            Point tgt = new Point(p.x, p.y - 9);
             strafeToClosestPoint(tgt);
             pause();
             driveToClosestPoint(tgt);
         } else {
-            Point tgt = new Point(currentPos.x, currentPos.y + 9);
+            Point tgt = new Point(currentPos.x, currentPos.y + 11);
             driveToClosestPoint(tgt);
         }
         pause();
@@ -113,9 +115,33 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     public abstract void park();
 
+    public void dropPixel() {
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        wristServo.setPosition(0.7);
+
+        ElapsedTime t = new ElapsedTime();
+        t.reset();
+
+        while (opModeIsActive()) {
+            if (t.milliseconds() > 4000) {
+                grabServo.setPosition(MintGrabber.OPEN_POSITION);
+            }
+
+            if (t.milliseconds() > 5000) {
+                break;
+            }
+
+            armMotor.setTargetPosition(-370);
+            armMotor.setPower(.5);
+            armMotor.setMode(RUN_TO_POSITION);
+            sleep(1);
+        }
+    }
+
     public void retractArm() {
         wristServo.setPosition(0.1);
-        grabServo.setPosition(0.95);
+        grabServo.setPosition(MintGrabber.CLOSED_POSITION);
 
         ElapsedTime t = new ElapsedTime();
         t.reset();
@@ -134,30 +160,6 @@ public abstract class AutoOpMode extends LinearOpMode {
                 armMotor.setMode(RUN_TO_POSITION);
                 sleep(1);
             }
-        }
-    }
-
-    public void dropPixel() {
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        wristServo.setPosition(0.75);
-
-        ElapsedTime t = new ElapsedTime();
-        t.reset();
-
-        while (opModeIsActive()) {
-            if (t.milliseconds() > 4000) {
-                grabServo.setPosition(0.4);
-            }
-
-            if (t.milliseconds() > 5000) {
-                break;
-            }
-
-            armMotor.setTargetPosition(-370);
-            armMotor.setPower(.5);
-            armMotor.setMode(RUN_TO_POSITION);
-            sleep(1);
         }
     }
 

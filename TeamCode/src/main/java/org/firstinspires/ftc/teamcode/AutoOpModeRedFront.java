@@ -2,8 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import parts.MintAutonomous;
+
 @Autonomous
-public class AutoOpModeRedFront extends AutoOpMode {
+public class AutoOpModeRedFront extends MintAutonomous {
 
     public AutoOpModeRedFront() {
         super(new Position(144 - frontStartX, frontStartY, 0, 1, 0));

@@ -29,29 +29,20 @@ public class Positioning {
         this.IMU = IMU;
         this.telemetry = telemetry;
 
-        AprilTagProcessor.Builder myAprilTagProcBuilder = new AprilTagProcessor.Builder()
-                .setDrawTagID(true)
-                .setDrawTagOutline(true)
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true);
+        AprilTagProcessor.Builder myAprilTagProcBuilder = new AprilTagProcessor.Builder().setDrawTagID(true).setDrawTagOutline(true).setDrawAxes(true).setDrawCubeProjection(true);
 
         myAprilTagProc = myAprilTagProcBuilder.build();
 
         com.qualcomm.robotcore.hardware.IMU.Parameters myIMUparameters;
 
-        myIMUparameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
-                )
-        );
+        myIMUparameters = new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP));
 
         IMU.initialize(myIMUparameters);
 
         intialHeading = getHeading();
     }
 
-    public void resetPosition(){
+    public void resetPosition() {
         intialHeading = getHeading();
     }
 
@@ -107,11 +98,7 @@ public class Positioning {
     public double getHeading() {
         Orientation myRobotOrientation;
 
-        myRobotOrientation = IMU.getRobotOrientation(
-                AxesReference.INTRINSIC,
-                AxesOrder.XYZ,
-                AngleUnit.DEGREES
-        );
+        myRobotOrientation = IMU.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
         double zAxis = myRobotOrientation.thirdAngle;
 
