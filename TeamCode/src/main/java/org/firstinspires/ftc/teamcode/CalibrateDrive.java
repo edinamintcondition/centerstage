@@ -49,7 +49,11 @@ public class CalibrateDrive extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (areIdle()) {
-                break;
+                telemetry.addData("Front Left", leftFront.getCurrentPosition());
+                telemetry.addData("Front Right", rightFront.getCurrentPosition());
+                telemetry.addData("Back Left", leftBack.getCurrentPosition());
+                telemetry.addData("BackRight", rightBack.getCurrentPosition());
+                telemetry.update();
             }
         }
     }

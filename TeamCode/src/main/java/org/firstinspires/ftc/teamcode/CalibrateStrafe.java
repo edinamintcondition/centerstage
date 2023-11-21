@@ -9,16 +9,17 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Autonomous
 public class CalibrateStrafe extends LinearOpMode {
-
-    DcMotor[] motors, fwdMotors, revMotors;
+    DcMotorEx[] motors, fwdMotors, revMotors;
 
     @Override
     public void runOpMode() {
-        int targetPos = 2500;
-        double power = 0.1;
+        int targetPos = -5000;
 
         DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "front_left_motor");
         DcMotorEx rightFront = hardwareMap.get(DcMotorEx.class, "front_right_motor");
@@ -30,7 +31,7 @@ public class CalibrateStrafe extends LinearOpMode {
         rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motors = new DcMotor[]{leftFront, leftBack, rightFront, rightBack};
+        motors = new DcMotorEx[]{leftFront, leftBack, rightFront, rightBack};
 
         fwdMotors = new DcMotorEx[]{leftFront, rightBack};
 
@@ -42,25 +43,35 @@ public class CalibrateStrafe extends LinearOpMode {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
 
+        double power = 0.1;
+        for (VoltageSensor vs : hardwareMap.voltageSensor) {
+            power = 0.1 * vs.getVoltage() / 14;
+            break;
+        }
+
         sleep(100);
 
-        for (DcMotor m : fwdMotors) {
+        for (DcMotorEx m : fwdMotors) {
             int p = m.getCurrentPosition();
             m.setTargetPosition(p + targetPos);
-            m.setPower(power);
+            m.setVelocity(30, AngleUnit.DEGREES);
             m.setMode(RUN_TO_POSITION);
         }
 
-        for (DcMotor m : revMotors) {
+        for (DcMotorEx m : revMotors) {
             int p = m.getCurrentPosition();
             m.setTargetPosition(p - targetPos);
-            m.setPower(power);
+            m.setVelocity(30, AngleUnit.DEGREES);
             m.setMode(RUN_TO_POSITION);
         }
 
         while (opModeIsActive()) {
             if (areIdle()) {
-                break;
+                telemetry.addData("Front Left", leftFront.getCurrentPosition());
+                telemetry.addData("Front Right", rightFront.getCurrentPosition());
+                telemetry.addData("Back Left", leftBack.getCurrentPosition());
+                telemetry.addData("BackRight", rightBack.getCurrentPosition());
+                telemetry.update();
             }
         }
     }
