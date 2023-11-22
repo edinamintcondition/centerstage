@@ -10,9 +10,9 @@ public class MintWrist {
 
     // Constants
     String servoName = "wrist_servo";
-    final double FINAL_POSITION = 0.95;
+    final double FINAL_POSITION = 0.7;
     final double ZERO_POSITION = 0;
-    final double FLAT_POSITION = 0.7;
+    final double FLAT_POSITION = 0.6;
 
     // Variables
     Gamepad gamepad;
@@ -52,7 +52,7 @@ public class MintWrist {
         }
 
         telemetry.addData(">", pressedButton + " is pressed :D");
-        telemetry.addData("Wrist Servo position:", myServo.getPosition());
+        telemetry.addData("The Wrist Servo position:", myServo.getPosition());
     }
 
 
