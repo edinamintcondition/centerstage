@@ -10,9 +10,11 @@ public class MintGrabber {
 
     //Constants
     String servoName = "grab_servo";
-    final double FINAL_POSITION = 0.95;
-    final double START_POSITION = 0.4;
+    public static final double CLOSED_POSITION = 0.96;
+    public static final double OPEN_POSITION = 0.5;
 
+    public static void init(Servo s) {
+    }
 
     //Variables
     Servo myServo;
@@ -30,6 +32,8 @@ public class MintGrabber {
 
     //Methods
     public void run() {
+        init(myServo);
+
         String pressedButton = null;
         // move servo
         if (gamepad.left_bumper) {
@@ -47,12 +51,12 @@ public class MintGrabber {
     }
 
     public void closeGrab() {
-        myServo.setPosition(FINAL_POSITION); // rotate clockwise
+        myServo.setPosition(CLOSED_POSITION); // rotate clockwise
         telemetry.addData(">", "GRAB CLOSED GRRRR");
     }
 
     public void openGrab() {
-        myServo.setPosition(START_POSITION); // rotate counterclockwise
+        myServo.setPosition(OPEN_POSITION); // rotate counterclockwise
         telemetry.addData(">", "GRAB OPEN COACH");
     }
 
@@ -61,7 +65,7 @@ public class MintGrabber {
     }
 
     public void stop() {
-        myServo.setPosition(START_POSITION); // stops rotation
+        myServo.setPosition(OPEN_POSITION); // stops rotation
     }
 
     public void start() {
