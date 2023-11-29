@@ -3,6 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import parts.MintAutonomous;
+import parts.MintWrist;
+import parts.MintGrabber;
+import parts.MintArm;
+import parts.MintCamera;
 
 @Autonomous
 public class AutoOpModeBlueBack extends MintAutonomous {
