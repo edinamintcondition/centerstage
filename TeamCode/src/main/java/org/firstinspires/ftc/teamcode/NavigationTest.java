@@ -1,76 +1,71 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import parts.MintWheels;
-
 import java.util.List;
 
-@Autonomous
-@Disabled
+@TeleOp
 public class NavigationTest extends LinearOpMode {
+    private final double[] allmx = {29.381, 35.381, 41.381, 100.0435, 106.0435, 112.0435};
+    private final double[] allmy = {132.492908, 132.492908, 132.492908, 132.492908, 132.492908, 132.492908, 0, 0, 0, 0};
 
     @Override
     public void runOpMode() {
-//        Positioning pos = new Positioning();
-//        MintWheels autoDrive = new MintWheels(hardwareMap, gamepad1, telemetry);
-//
-//        //set camera
-//        WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
-//        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, pos.myAprilTagProc);
-//
-//        waitForStart();
-//
-//        while (opModeIsActive()) {
-//            Position currentPos = pos.getPosition();
-//            if (currentPos == null)
-//                continue;
-//
-//            double rx = currentPos.x;
-//            double ry = currentPos.y;
-//            double a = currentPos.a;
-//            double dx = currentPos.dx;
-//            double dy = currentPos.dy;
-//
-//            double goalY = 120;
-//            double goalX = 90;
-//            double goalYaw = 0;
-//
-//            double ty = goalY - ry;
-//            double tx = goalX - rx;
-//
-//            double axial = (tx * dx) + (ty * dy);
-//            double lateral = (tx * dy) - (ty * dx);
-//            double yaw = a - goalYaw;
-//            yaw = 0;
-//
-//            if (yaw < -180) {
-//                yaw = yaw + 360;
-//            }
-//
-//            if (yaw > 180) {
-//                yaw = yaw - 360;
-//            }
-//
-//            double powerLimit = 0.25;
-//
-//            telemetry.addData("r", "%.1f, %.1f", rx, ry);
-//            telemetry.addData("a", "%.1f", a);
-//            telemetry.addData("d", "%.1f, %.1f", dx,dy);
-//            telemetry.addData("ax lat", "%.1f, %.1f", axial, lateral);
-//            telemetry.addData("yaw","%.1f",yaw);
-//            telemetry.update();
-//
-//            autoDrive.runAny(axial, lateral, yaw, powerLimit);
- //       }
+        AprilTagProcessor.Builder myAprilTagProcBuilder;
+        AprilTagProcessor myAprilTagProc;
+
+        myAprilTagProcBuilder = new AprilTagProcessor.Builder()
+                .setDrawTagID(true)
+                .setDrawTagOutline(true)
+                .setDrawAxes(true)
+                .setDrawCubeProjection(true);
+
+        myAprilTagProc = myAprilTagProcBuilder.build();
+
+        WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
+        VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, myAprilTagProc);
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            List<AprilTagDetection> currentDetections = myAprilTagProc.getDetections();
+            for (AprilTagDetection detection : currentDetections) {
+                if (detection.metadata != null && detection.id <= 6) {
+                    int i = detection.id - 1;
+
+                    double mx = allmx[i];
+                    double my = allmy[i];
+
+                    double mc = Math.sqrt((detection.ftcPose.x * detection.ftcPose.x) + (detection.ftcPose.y * detection.ftcPose.y));
+
+                    double dx = Math.sin(Math.toRadians(detection.ftcPose.yaw));
+                    double dy = Math.cos(Math.toRadians(detection.ftcPose.yaw));
+
+                    double qc = dx * mc;
+                    double rx = qc + mx;
+
+                    double mq = dy * mc;
+                    double ry = my - mq;
+
+                    telemetry.addData("ID", detection.id);
+                    telemetry.addData("cx", detection.ftcPose.x);
+                    telemetry.addData("cy", detection.ftcPose.y);
+                    telemetry.addData("yaw", detection.ftcPose.yaw);
+                    telemetry.addData("rx", rx);
+                    telemetry.addData("ry", ry);
+                    telemetry.addData("dx", dx);
+                    telemetry.addData("dy", dy);
+                    break;
+                }
+            }
+            telemetry.update();
+        }
     }
 }
