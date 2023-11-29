@@ -16,8 +16,10 @@ import org.firstinspires.ftc.teamcode.Point;
 import org.firstinspires.ftc.teamcode.Position;
 import org.firstinspires.ftc.teamcode.Positioning;
 
+import parts.MintWrist;
 import parts.MintGrabber;
-
+import parts.MintArm;
+import parts.MintCamera;
 public abstract class MintAutonomous extends LinearOpMode {
 
     double gearRatio = 20;
