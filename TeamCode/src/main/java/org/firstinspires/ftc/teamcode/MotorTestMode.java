@@ -1,9 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp
 public class MotorTestMode extends LinearOpMode {
@@ -27,15 +32,19 @@ public class MotorTestMode extends LinearOpMode {
             }
             if (gamepad1.y) {
                 m = hardwareMap.get(DcMotor.class, "back_left_motor");
+                mc = MotorConfig.driveMotor;
             }
             if (gamepad1.a) {
                 m = hardwareMap.get(DcMotor.class, "front_right_motor");
+                mc = MotorConfig.driveMotor;
             }
             if (gamepad1.b) {
                 m = hardwareMap.get(DcMotor.class, "back_right_motor");
+                mc = MotorConfig.driveMotor;
             }
             if (gamepad1.dpad_up) {
                 m = hardwareMap.get(DcMotor.class, "arm_motor");
+                mc = MotorConfig.armMotor;
             }
 
             if (m != null) {
@@ -43,17 +52,30 @@ public class MotorTestMode extends LinearOpMode {
             }
         }
 
-        while (opModeIsActive()) {
-            m.setPower(0);
-            // run to position = 360 deg
-            // sleep 1000
-        }
+        m.setMode(STOP_AND_RESET_ENCODER);
+        m.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        ElapsedTime t=new ElapsedTime();
 
         while (opModeIsActive()) {
-            // set 12v power
-            // convert position to degrees
-            // put degrees in speedometer
-            // display speed in telemetry
+            m.setTargetPosition(mc.toPos(360));
+            m.setPower(1);
+            m.setMode(RUN_TO_POSITION);
+
+            if(t.milliseconds() > 1000) {
+                break;
+            }
+        }
+
+        Speedometer s = new Speedometer(8);
+        m.setMode(RUN_WITHOUT_ENCODER);
+
+        while (opModeIsActive()) {
+            m.setPower(12 / vs.getVoltage());
+            double motorCurDeg = mc.toDeg(m.getCurrentPosition());
+            s.sample(motorCurDeg);
+
+            telemetry.addData("speed", s.getSpeed());
+            telemetry.update();
         }
     }
 
