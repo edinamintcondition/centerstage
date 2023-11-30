@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import parts.MintAutonomous;
-
 @Autonomous
 public class AutoOpModeBlueFront extends MintAutonomous {
 

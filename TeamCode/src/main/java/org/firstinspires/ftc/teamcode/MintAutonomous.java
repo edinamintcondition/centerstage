@@ -1,4 +1,4 @@
-package parts;
+package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
@@ -16,8 +16,10 @@ import org.firstinspires.ftc.teamcode.Point;
 import org.firstinspires.ftc.teamcode.Position;
 import org.firstinspires.ftc.teamcode.Positioning;
 
+import parts.MintWrist;
 import parts.MintGrabber;
-
+import parts.MintArm;
+import parts.MintCamera;
 public abstract class MintAutonomous extends LinearOpMode {
 
     double gearRatio = 20;

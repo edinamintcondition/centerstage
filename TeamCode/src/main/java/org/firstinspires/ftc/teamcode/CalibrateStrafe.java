@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -39,6 +40,8 @@ public class CalibrateStrafe extends LinearOpMode {
 
         waitForStart();
 
+        ElapsedTime timer=new ElapsedTime();
+
         for (DcMotor m : motors) {
             m.setMode(STOP_AND_RESET_ENCODER);
         }
@@ -65,7 +68,12 @@ public class CalibrateStrafe extends LinearOpMode {
             m.setMode(RUN_TO_POSITION);
         }
 
+        int i=0;
         while (opModeIsActive()) {
+            telemetry.addData("rate", i / timer.seconds());
+            telemetry.update();
+            i++;
+
             if (areIdle()) {
                 telemetry.addData("Front Left", leftFront.getCurrentPosition());
                 telemetry.addData("Front Right", rightFront.getCurrentPosition());
