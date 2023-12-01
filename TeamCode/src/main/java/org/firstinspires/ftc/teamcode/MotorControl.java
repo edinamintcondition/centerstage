@@ -13,6 +13,8 @@ public class MotorControl {
     private final ElapsedTime timer;
     private final LinearFuncFitter modelFitter;
     private LinearFunc model;
+    private double targetAccel;
+    private double nextTargetAccel;
 
     public MotorControl(DcMotor m, MotorConfig mConf, VoltageSensor voltSense) {
         this.mConf = mConf;
@@ -21,6 +23,14 @@ public class MotorControl {
         s = new Speedometer(4);
         timer = new ElapsedTime();
         modelFitter = new LinearFuncFitter(8);
+    }
+
+    public void setTargetAccel(double a) {
+        nextTargetAccel = a;
+    }
+
+    public double getSpeed() {
+        return prevSpeed;
     }
 
     public void run() {
@@ -35,7 +45,29 @@ public class MotorControl {
             return;
         }
 
-        double currAccel = (currSpeed - prevSpeed) / timer.seconds();
+        double accel = (currSpeed - prevSpeed) / timer.seconds();
+
+        boolean useModel;
+        if (model != null) {
+            useModel = Math.abs(accel - targetAccel) < 1;
+        } else {
+            useModel = false;
+        }
+
+        addToModel(accel, torqueFrac);
+
+        if (Math.abs(currSpeed) > 200)
+            nextTargetAccel = 0;
+
+        targetAccel = nextTargetAccel;
+        prevSpeed = currSpeed;
+
+        if (useModel) {
+            torqueFrac = model.eval(targetAccel);
+        } else {
+            double z = Math.random() * 0.01;
+            torqueFrac = (torqueFrac + z) * .5;
+        }
 
         timer.reset();
     }
@@ -45,7 +77,13 @@ public class MotorControl {
             return;
 
         modelFitter.sample(accel, torqueFrac);
-        model = modelFitter.fit();
+        LinearFunc model = modelFitter.fit();
+
+        if (model != null) {
+            if (Math.abs(model.R2) > 0.3) {
+                this.model = model;
+            }
+        }
     }
 
     private boolean in(double x, Iterable<Double> seq, double tol) {
