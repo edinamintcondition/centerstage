@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class LinearFuncFitter {
     private final int numSamples;
@@ -10,6 +11,14 @@ public class LinearFuncFitter {
         this.numSamples = numSamples;
         xs = new ArrayList<Double>();
         ys = new ArrayList<Double>();
+    }
+
+    public Iterable<Double> getXData() {
+        return xs;
+    }
+
+    public Iterable<Double> getYData() {
+        return ys;
     }
 
     public void sample(double x, double y) {
@@ -25,7 +34,6 @@ public class LinearFuncFitter {
     }
 
     public LinearFunc fit() {
-
         // find average
         int n = Math.min(xs.size(), ys.size());
         double xSum = 0.0;
@@ -62,7 +70,7 @@ public class LinearFuncFitter {
         double rss = 0.0;
         double tss = 0.0;
         for (int i = 0; i < n; i++) {
-            double yHat = beta * xs.get(i) +alpha;
+            double yHat = beta * xs.get(i) + alpha;
             double res = ys.get(i) - yHat;
             double t = ys.get(i) - yMean;
 

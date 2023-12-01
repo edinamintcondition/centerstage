@@ -70,7 +70,7 @@ public class MotorTestMode extends LinearOpMode {
         m.setMode(RUN_WITHOUT_ENCODER);
 
         while (opModeIsActive()) {
-            m.setPower(12 / vs.getVoltage());
+            m.setPower(mc.nominalVolt / vs.getVoltage());
             double motorCurDeg = mc.toDeg(m.getCurrentPosition());
             s.sample(motorCurDeg);
 
