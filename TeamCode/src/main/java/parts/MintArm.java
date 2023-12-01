@@ -21,6 +21,7 @@ public class MintArm {
     Gamepad gamepad;
     Telemetry telemetry;
     DcMotor armMotor;
+    boolean isStrongArm;
 
     // Constructor
     public MintArm(HardwareMap hardwareMap, Gamepad gamepadToUse, Telemetry aTelemetry) {
@@ -37,19 +38,19 @@ public class MintArm {
     //Methods
     public void run() {
 
-        /* This code *literally* breaks the robot but would work with a stronger wrist servo
         if (isStrongArm || gamepad.right_trigger > 0.8) {
             armMotor.setPower(1.00);
             isStrongArm = true;
-            telemetry.addData(">", "STRONGARM HAHAHA");
+            telemetry.addData(">", "STRONGARM HAHAHAHA");
 
             if (gamepad.left_trigger > 0.8) {
                 armMotor.setPower(0.00);
                 isStrongArm = false;
-                telemetry.addData(">", "Back to normal!");
+                telemetry.addData(">", "Back to normal!!");
             }
+
         } else {
-         */
+
         double armPower = gamepad.left_stick_y * normPower;
         telemetry.addData(">", "normal arm power D':");
 
@@ -57,7 +58,7 @@ public class MintArm {
         armMotor.setPower(armPower);
 
         telemetry.addData("Arm " + armMotor.getDeviceName(), "%f %d", armPower, armMotor.getCurrentPosition());
-//        }
+        }
     }
 
 }

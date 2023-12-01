@@ -36,15 +36,15 @@ public class MintWrist {
         String pressedButton = "nothing";
         // move servo
         if (gamepad.a) {
-            grabber.closeGrab();
+            grabber.closeGrabLR();
             pressedButton = "'a'";
             positionTwo(); // fully extend
         } else if (gamepad.b) {
-            grabber.closeGrab();
+            grabber.closeGrabLR();
             pressedButton = "'b'";
             positionZero(); // retract
         } else if (gamepad.x) {
-            grabber.closeGrab();
+            grabber.closeGrabLR();
             pressedButton = "'x'";
             positionOne(); // extend until flat with the ground
         } else if (gamepad.y) {
