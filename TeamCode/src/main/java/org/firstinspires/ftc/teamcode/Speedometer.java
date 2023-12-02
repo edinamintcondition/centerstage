@@ -18,6 +18,14 @@ public class Speedometer {
         return speed;
     }
 
+    public int getNumSamples() {
+        return fitter.getNumSamples();
+    }
+
+    public void clearSamples() {
+        fitter.clear();
+    }
+
     public void sample(double degrees) {
         fitter.sample(elapsedTime.seconds(), degrees);
         LinearFunc fit = fitter.fit();

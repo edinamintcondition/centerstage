@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LinearFuncFitter {
     private final int numSamples;
     private final ArrayList<Double> xs, ys;
+    private int n;
 
     public LinearFuncFitter(int numSamples) {
         this.numSamples = numSamples;
@@ -13,29 +18,23 @@ public class LinearFuncFitter {
         ys = new ArrayList<Double>();
     }
 
-    public Iterable<Double> getXData() {
-        return xs;
-    }
-
-    public Iterable<Double> getYData() {
-        return ys;
-    }
-
     public void sample(double x, double y) {
-        while (xs.size() >= numSamples) {
-            xs.remove(0);
-        }
-        while (ys.size() >= numSamples) {
-            ys.remove(0);
-        }
+        push(xs, x);
+        push(ys, y);
+        n = Math.min(xs.size(), ys.size());
+    }
 
-        xs.add(x);
-        ys.add(y);
+    public void clear() {
+        xs.clear();
+        ys.clear();
+    }
+
+    public int getNumSamples() {
+        return n;
     }
 
     public LinearFunc fit() {
         // find average
-        int n = Math.min(xs.size(), ys.size());
         double xSum = 0.0;
         double ySum = 0.0;
         for (int i = 0; i < n; i++) {
@@ -81,5 +80,23 @@ public class LinearFuncFitter {
         double r2 = 1 - rss / tss;
 
         return new LinearFunc(beta, alpha, r2);
+    }
+
+    @SuppressLint("DefaultLocale")
+    @NonNull
+    @Override
+    public String toString() {
+        String s = "";
+        for (int i = 0; i < Math.min(xs.size(), ys.size()); i++) {
+            s += String.format(" (%.2f,%.2f)", xs.get(i), ys.get(i));
+        }
+
+        return s;
+    }
+
+    private void push(ArrayList<Double> list, double val) {
+        list.add(val);
+        while (list.size() > numSamples)
+            list.remove(0);
     }
 }
