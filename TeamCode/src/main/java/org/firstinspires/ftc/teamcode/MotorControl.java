@@ -18,10 +18,12 @@ public class MotorControl {
     private final BilinearFuncFitter modelFitter;
     private final LinearFuncFitter modelFitter1;
     private BilinearFunc model;
-    private LinearFunc model1;
+    private LinearFunc model1, accelModel, coastModel, deccelModel;
     private int numAccelSamples, numCoastSamples;
     private double targetAccel, targetSpeed, accel;
     private final double maxAccel;
+    private double accelFrac, coastFrac, deccelFrac;
+    private boolean canCalibrate;
 
     public MotorControl(DcMotor m, MotorConfig mConf, VoltageSensor voltSense, double maxAccel) {
         this.mConf = mConf;
@@ -33,8 +35,14 @@ public class MotorControl {
         timer = new ElapsedTime();
         modelFitter = new BilinearFuncFitter(50);
         modelFitter.sample(0, 0, 0);
+        accelModel = new LinearFunc(0, 0, 0);
 
         modelFitter1 = new LinearFuncFitter(50);
+
+        // should get from motor config
+        accelFrac = 0.2;
+        coastFrac = 0.05;
+        deccelFrac = -0.15;
     }
 
     public void setTargetSpeed(double speed) {

@@ -11,13 +11,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import parts.MintWheels;
 
 @TeleOp
-@Disabled
+//@Disabled
 public class BasicControls extends LinearOpMode {
     @Override
     public void runOpMode() {
         //These are the names on the driver hub
         DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
-        Servo testServo = hardwareMap.get(Servo.class, "test_servo");
+        Servo testServo = hardwareMap.get(Servo.class, "wrist_servo");
 
         MintWheels drive = new MintWheels(hardwareMap, gamepad1, telemetry);
 

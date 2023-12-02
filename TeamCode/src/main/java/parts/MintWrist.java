@@ -10,8 +10,8 @@ public class MintWrist {
 
     // Constants
     String servoName = "wrist_servo";
-    public static final double FINAL_POSITION = 0.95;
-    public static final double ZERO_POSITION = 0;
+    public static final double FINAL_POSITION = 0.75;
+    public static final double ZERO_POSITION = 0.1;
     public static final double FLAT_POSITION = 0.65;
 
     // Variables

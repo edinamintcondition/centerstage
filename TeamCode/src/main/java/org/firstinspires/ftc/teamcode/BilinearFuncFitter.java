@@ -3,6 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import org.firstinspires.ftc.robotcore.external.matrices.DenseMatrixF;
+import org.firstinspires.ftc.robotcore.external.matrices.GeneralMatrixF;
+import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
+import org.firstinspires.ftc.robotcore.external.matrices.RowMajorMatrixF;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 
 import java.util.ArrayList;
 
@@ -23,7 +30,35 @@ public class BilinearFuncFitter {
         push(ys, y);
     }
 
-    public BilinearFunc fit() {
+    public BilinearFunc fit(boolean assumeZeroIntercept) {
+        if (assumeZeroIntercept)
+            return fitWithZeroIntercept();
+        else
+            return fitWithIntercept();
+    }
+
+    private BilinearFunc fitWithIntercept() {
+        int n = getNumSamples();
+        MatrixF x = new GeneralMatrixF(n, 3);
+        VectorF y = VectorF.length(n);
+        for (int i = 0; i < n; i++) {
+            x.put(i, 0, x0s.get(i).floatValue());
+            x.put(i, 1, x1s.get(i).floatValue());
+            x.put(i, 2, 1);
+
+            y.put(i, ys.get(i).floatValue());
+        }
+
+        MatrixF xt = x.transposed();
+        MatrixF proj = xt.multiplied(x).inverted().multiplied(xt);
+
+        VectorF beta = proj.multiplied(y);
+
+        return new BilinearFunc(beta.get(0), beta.get(1), beta.get(2));
+    }
+
+    @Nullable
+    private BilinearFunc fitWithZeroIntercept() {
         double x00 = 0;
         double x01 = 0;
         double x11 = 0;
@@ -63,7 +98,7 @@ public class BilinearFuncFitter {
     @NonNull
     @Override
     public String toString() {
-        String s="";
+        String s = "";
         for (int i = 0; i < getNumSamples(); i++) {
             s += String.format(" (%.2f,%.2f,%.2f)", x0s.get(i), x1s.get(i), ys.get(i));
         }
