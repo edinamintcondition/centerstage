@@ -30,23 +30,23 @@ public class TractionControlTest extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "back_right_motor");
         rightBack.setDirection(REVERSE);
 
-        MotorControl[] motors = new MotorControl[] {
-                new MotorControl(leftFront, MotorConfig.driveMotor, getVs()),
-                new MotorControl(rightFront, MotorConfig.driveMotor, getVs()),
-                new MotorControl(leftBack, MotorConfig.driveMotor, getVs()),
-                new MotorControl(rightBack, MotorConfig.driveMotor, getVs())
+        MotorControl[] motors = new MotorControl[]{
+                new MotorControl(leftFront, MotorConfig.driveMotor, getVs(), 10),
+                new MotorControl(rightFront, MotorConfig.driveMotor, getVs(), 10),
+                new MotorControl(leftBack, MotorConfig.driveMotor, getVs(), 10),
+                new MotorControl(rightBack, MotorConfig.driveMotor, getVs(), 10)
         };
 
         waitForStart();
 
         for (MotorControl m : motors) {
-            m.setTargetAccel(1);
+            m.setTargetSpeed(90);
         }
 
         while (opModeIsActive()) {
-            for (MotorControl m : motors) {
-                m.run();
-                telemetry.addData("speed",m.getSpeed());
+            for (int i = 0; i < motors.length; i++) {
+                motors[i].run();
+                telemetry.addData("motor" + i, motors[i]);
             }
 
             telemetry.update();
