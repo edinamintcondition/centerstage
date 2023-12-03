@@ -24,6 +24,13 @@ public class MotorControl {
     private final double maxAccel;
     private double accelFrac, coastFrac, deccelFrac;
     private boolean canCalibrate;
+    private final MotorCalibrator accelCal, coastCal, deccelCal;
+    private MotorCalibrator activeCal;
+
+    private enum State {Stopped, Accel, Coast, Deccel}
+
+    private State state;
+    private int direction;
 
     public MotorControl(DcMotor m, MotorConfig mConf, VoltageSensor voltSense, double maxAccel) {
         this.mConf = mConf;
@@ -43,90 +50,142 @@ public class MotorControl {
         accelFrac = 0.2;
         coastFrac = 0.05;
         deccelFrac = -0.15;
+
+        state = State.Stopped;
+
+        accelCal = new MotorCalibrator(maxAccel, 0.16);
+        coastCal = new MotorCalibrator(0, 0.06);
+        deccelCal = new MotorCalibrator(-maxAccel, -0.05);
     }
 
     public void setTargetSpeed(double speed) {
         targetSpeed = speed;
+        if (Math.abs(speed) > getActualSpeed()) {
+            if (speed > getActualSpeed()) {
+                setState(State.Accel, 1);
+            } else {
+                setState(State.Accel, -1);
+            }
+        } else {
+            if (speed < getActualSpeed()) {
+                setState(State.Deccel, 1);
+            } else {
+                setState(State.Deccel, -1);
+            }
+        }
     }
 
     public double getActualSpeed() {
-        return prevSpeed;
+        return s.getSpeed();
     }
 
     boolean oops;
 
     public void run() {
-        double motorCurDeg = mConf.toDeg(m.getCurrentPosition());
-        s.sample(motorCurDeg);
+        double motorCurrDeg = mConf.toDeg(m.getCurrentPosition());
+        s.sample(motorCurrDeg);
         double currSpeed = s.getSpeed();
 
-        accelometer.sample(currSpeed);
+//        accelometer.sample(currSpeed);
+
+        if (state == State.Accel && Math.abs(currSpeed - targetSpeed) < 10) {
+            setState(State.Coast, direction);
+        }
+        if (state == State.Deccel && Math.abs(currSpeed) < 10) {
+            setState(State.Stopped, direction);
+        }
+
+        if (activeCal != null) {
+            activeCal.sample(motorCurrDeg);
+            torqueFrac = activeCal.getTorqueFrac() * direction;
+        } else {
+            torqueFrac = 0;
+        }
 
         double volt = (torqueFrac + currSpeed / mConf.topSpeed) * mConf.nominalVolt;
         if (Math.abs(currSpeed) < 5 && Math.abs(torqueFrac) < 0.01) {
-            volt *= 2;
+            volt = 6 * Math.signum(volt);
         }
         m.setPower(volt / voltSense.getVoltage());
 
-        if (accelometer.getNumSamples() < 10) {
-            return;
-        }
-
-        accel = accelometer.getSpeed();
-
-        if (model == null) {
-            modelFitter.sample(accel, prevSpeed, torqueFrac);
-            modelFitter1.sample(accel, torqueFrac);
-
-            if (numAccelSamples < 10) {
-                torqueFrac = 0.2;
-                numAccelSamples++;
-            } else if (numCoastSamples < 10) {
-                torqueFrac = 0;
-                numCoastSamples++;
-            } else {
-//                model = modelFitter.fit();
-//                if (model == null) {
-//                    throw new RuntimeException("oops");
+//        if (accelometer.getNumSamples() < 10) {
+//            return;
+//        }
+//
+//        accel = accelometer.getSpeed();
+//
+//        if (model == null) {
+//            modelFitter.sample(accel, prevSpeed, torqueFrac);
+//            modelFitter1.sample(accel, torqueFrac);
+//
+//            if (numAccelSamples < 10) {
+//                torqueFrac = 0.2;
+//                numAccelSamples++;
+//            } else if (numCoastSamples < 10) {
+//                torqueFrac = 0;
+//                numCoastSamples++;
+//            } else {
+////                model = modelFitter.fit();
+////                if (model == null) {
+////                    throw new RuntimeException("oops");
+////                }
+//                model1 = modelFitter1.fit();
+//                if (model1 == null) {
+//                    oops = true;
+//                    return;
 //                }
-                model1 = modelFitter1.fit();
-                if (model1 == null) {
-                    oops = true;
-                    return;
-                }
-            }
+//            }
+//        }
+//
+//        if (model != null) {
+//            if (Math.abs(currSpeed - targetSpeed) < 5) {
+//                targetAccel = 0;
+//            } else if (currSpeed < targetSpeed) {
+//                targetAccel = maxAccel;
+//            } else {
+//                targetAccel = -maxAccel;
+//            }
+//
+//            torqueFrac = model.eval(targetAccel, 0 * currSpeed);
+//            torqueFrac = model1.eval(targetAccel);
+//            torqueFrac = Math.min(Math.max(torqueFrac, -1), 1);
+//        }
+//
+//        prevSpeed = currSpeed;
+//
+//        timer.reset();
+//        accelometer.clearSamples();
+    }
+
+    private void setState(State s, int dir) {
+        if (activeCal != null)
+            accelCal.setActive(false);
+
+        state = s;
+        direction = dir;
+
+        if (state == State.Accel) {
+            accelCal.setActive(true);
+            activeCal = accelCal;
+        } else if (state == State.Coast) {
+            coastCal.setActive(true);
+            activeCal = coastCal;
+        } else if (state == State.Deccel) {
+            deccelCal.setActive(true);
+            activeCal = deccelCal;
+        } else {
+            activeCal = null;
         }
-
-        if (model != null) {
-            if (Math.abs(currSpeed - targetSpeed) < 5) {
-                targetAccel = 0;
-            } else if (currSpeed < targetSpeed) {
-                targetAccel = maxAccel;
-            } else {
-                targetAccel = -maxAccel;
-            }
-
-            torqueFrac = model.eval(targetAccel, 0 * currSpeed);
-            torqueFrac = model1.eval(targetAccel);
-            torqueFrac = Math.min(Math.max(torqueFrac, -1), 1);
-        }
-
-        prevSpeed = currSpeed;
-
-        timer.reset();
-        accelometer.clearSamples();
     }
 
     @SuppressLint("DefaultLocale")
     @NonNull
     @Override
     public String toString() {
-        String s = String.format("ta=%.2f, a=%.2f, tf=%.2f, v=%.2f", targetAccel, accel, torqueFrac, getActualSpeed());
-        if (model != null) {
-            s = String.format("%s, βa=%.2g, βv=%.2g, α=%.2g", s, model.beta0, model.beta1, model.alpha);
-        }
-
-        s += modelFitter1;
+        String s = String.format("tf=%.2f, v=%.2f, %s", torqueFrac, getActualSpeed(), state);
+        s = String.format("%s, a=%.2g, atf=%.2g", s, accelCal.getAccel(), accelCal.getTorqueFrac());
+        s = String.format("%s, ctf=%.2g", s, coastCal.getTorqueFrac());
+        s = String.format("%s, dtf=%.2g", s, deccelCal.getTorqueFrac());
 
         return s;
     }

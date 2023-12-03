@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
 public class TractionControlTest extends LinearOpMode {
@@ -43,8 +44,12 @@ public class TractionControlTest extends LinearOpMode {
             m.setTargetSpeed(90);
         }
 
+        ElapsedTime t = new ElapsedTime();
         while (opModeIsActive()) {
             for (int i = 0; i < motors.length; i++) {
+                if (t.seconds() > 20)
+                    motors[i].setTargetSpeed(0);
+
                 motors[i].run();
                 telemetry.addData("motor" + i, motors[i]);
             }
