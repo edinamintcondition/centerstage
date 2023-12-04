@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import android.annotation.SuppressLint;
@@ -14,10 +13,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
+@SuppressLint("DefaultLocale")
 public class MotorCalMode extends LinearOpMode {
     private VoltageSensor vs;
+    private final MotorConfig mConf = MotorConfig.driveMotor;
 
-    @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() {
         getVs();
@@ -39,93 +39,127 @@ public class MotorCalMode extends LinearOpMode {
         telemetry.addData("test", "motor starting voltage");
         telemetry.update();
 
-        double[] startVolts = new double[4];
-        double maxVolts = 0;
-        for (int i = 0; i < 4; i++) {
-            startVolts[i] = testStartVolts(motors[i]);
-            maxVolts = Math.max(startVolts[i], maxVolts);
-        }
+        double startVolts = testStartVolts(motors);
 
         telemetry.addData("test", "motor acceleration");
         telemetry.update();
 
-        double[] accel = testAccel(motors, MotorConfig.driveMotor, 1.1 * maxVolts / 12);
+        double[] accel = testAccel(motors, 0.66 * startVolts / 12);
+        dump(motors, startVolts, accel);
 
-        for (int i = 0; i < 4; i++) {
-            String s = String.format("v start=%.2f, a=%.2f", startVolts[i], accel[i]);
-            telemetry.addData("motor" + i, s);
-        }
-        telemetry.update();
+        double[] accel2 = testAccel(motors, -0.66 * startVolts / 12, accel);
+        dump(motors, startVolts, accel2);
 
         while (opModeIsActive()) {
             sleep(1);
         }
     }
 
-    private double testStartVolts(DcMotor motor) {
-        motor.setMode(RUN_WITHOUT_ENCODER);
-        motor.setPower(0);
+    private double testStartVolts(DcMotor[] m) {
+        double[] initPos = new double[4];
+        for (int i = 0; i < 4; i++) {
+            m[i].setMode(RUN_WITHOUT_ENCODER);
+            m[i].setZeroPowerBehavior(BRAKE);
+            m[i].setPower(0);
 
-        double initPos = motor.getCurrentPosition();
-
-        ElapsedTime t = new ElapsedTime();
-        double volt = 0;
-        while (opModeIsActive()) {
-            if (Math.abs(motor.getCurrentPosition() - initPos) > 4)
-                break;
-
-            volt = t.seconds();
-            if (volt > 12) throw new RuntimeException("motor did not start");
-
-            telemetry.addData("power", volt / vs.getVoltage());
-            telemetry.update();
-
-            motor.setPower(volt / vs.getVoltage());
+            initPos[i] = m[i].getCurrentPosition();
         }
 
-        motor.setPower(0);
+        double volt = 0;
+        ElapsedTime t = new ElapsedTime();
+        while (opModeIsActive()) {
+            int moved = 0;
+            for (int i = 0; i < 4; i++) {
+                if (Math.abs(m[i].getCurrentPosition() - initPos[i]) > 4)
+                    moved++;
+            }
+
+            if (moved == 4)
+                break;
+
+            volt = t.seconds() / 2;
+            if (volt > 12) throw new RuntimeException("motor did not start");
+
+            telemetry.addData("volt", String.format("%.02f", volt));
+            telemetry.update();
+
+            for (int i = 0; i < 4; i++)
+                m[i].setPower(volt / vs.getVoltage());
+        }
+
+        for (int i = 0; i < 4; i++)
+            m[i].setPower(0);
         sleep(50);
 
         return volt;
     }
 
-    private double[] testAccel(DcMotor[] m, MotorConfig mConf, double torqueFrac) {
-        Speedometer[] s = new Speedometer[m.length];
-        Accelerometer[] a = new Accelerometer[m.length];
-        for (int i = 0; i < m.length; i++) {
+    private double[] testAccel(DcMotor[] m, double torqueFrac) {
+        double[] scale = new double[4];
+        for (int i = 0; i < 4; i++)
+            scale[i] = 1;
+
+        return testAccel(m, torqueFrac, scale);
+    }
+
+    private double[] testAccel(DcMotor[] m, double torqueFrac, double[] scale) {
+//        double avg = 0;
+//        for (int i = 0; i < 4; i++)
+//            avg += scale[i];
+//        avg /= m.length;
+
+        double[] tf = new double[4];
+        for (int i = 0; i < 4; i++)
+            tf[i] = torqueFrac;
+
+        if (Math.abs(torqueFrac) > 0.75)
+            throw new RuntimeException("torque frac should be <= 0.75");
+
+        Speedometer[] s = new Speedometer[4];
+        Accelerometer[] a = new Accelerometer[4];
+        for (int i = 0; i < 4; i++) {
             s[i] = new Speedometer(4);
             a[i] = new Accelerometer(10000);
         }
 
         boolean done = false;
         while (opModeIsActive()) {
-            for (int i = 0; i < m.length; i++) {
+            for (int i = 0; i < 4; i++) {
                 double motorCurrDeg = mConf.toDeg(m[i].getCurrentPosition());
                 s[i].sample(motorCurrDeg);
                 a[i].sample(motorCurrDeg);
 
                 double currSpeed = s[i].getSpeed();
-                if (currSpeed > 0.75 * mConf.topSpeed) {
+                if (Math.abs(currSpeed) > 0.75 * mConf.topSpeed) {
                     done = true;
                     break;
                 }
 
-                double volt = (torqueFrac + currSpeed / mConf.topSpeed) * mConf.nominalVolt;
+                double volt = (tf[i] + currSpeed / mConf.topSpeed) * mConf.nominalVolt;
                 m[i].setPower(volt / vs.getVoltage());
             }
 
-            if (done)
-                break;
+            if (done) break;
         }
 
         double[] totalAccel = new double[m.length];
-        for (int i = 0; i < m.length; i++) {
+        for (int i = 0; i < 4; i++) {
             totalAccel[i] = a[i].getAccel();
             m[i].setZeroPowerBehavior(BRAKE);
             m[i].setPower(0);
         }
 
         return totalAccel;
+    }
+
+    private void dump(DcMotor[] motors, double startVolts, double[] accel) {
+        telemetry.addData("v start", String.format("%.2f", startVolts));
+        for (int i = 0; i < 4; i++) {
+            double pos = mConf.toPos(motors[i].getCurrentPosition());
+            String s = String.format("p=%.2f, a=%.2f", pos, accel[i]);
+            telemetry.addData("motor" + i, s);
+        }
+        telemetry.update();
     }
 
     private void getVs() {
