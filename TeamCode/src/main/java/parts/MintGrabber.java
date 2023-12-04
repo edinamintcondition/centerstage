@@ -11,8 +11,8 @@ public class MintGrabber {
     //Constants
     String servoNameL = "grab_servo_L";
     String servoNameR = "grab_servo_R";
-    public static final double CLOSED_POSITION = 0.9;
-    public static final double OPEN_POSITION = 0.4;
+    public static final double CLOSED_POSITION = 0.96;
+    public static final double OPEN_POSITION = 0.5;
 
     public static void init(Servo s) {
     }
