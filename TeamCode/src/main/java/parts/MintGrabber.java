@@ -73,15 +73,15 @@ public class MintGrabber {
     }
 
     //both grabbers
-    public void closeGrabLR() {
+    public void openGrabLR() {
         myServoL.setPosition(CLOSED_POSITION); // close grabbers
         myServoR.setPosition(OPEN_POSITION);
-        telemetry.addData(">", "Both grabs closing :D");
+        telemetry.addData(">", "Both grabs opening :O");
     }
-    public void openGrabLR() {
+    public void closeGrabLR() {
         myServoL.setPosition(OPEN_POSITION); // open grabbers
         myServoR.setPosition(CLOSED_POSITION);
-        telemetry.addData(">", "Both grabs opening :O");
+        telemetry.addData(">", "Both grabs closing :D");
     }
 
     //left grabber

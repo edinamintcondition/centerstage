@@ -35,7 +35,9 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     Servo wristServo;
 
-    Servo grabServo;
+    Servo myServoL;
+
+    Servo myServoR;
 
     protected final static double frontStartX = 4, backStartX = 8.5, frontCentralX = frontStartX + 50, backboardX = 36;
     protected final static double frontStartY = 32, backStartY = 84, approachY = 112;
@@ -53,7 +55,8 @@ public abstract class MintAutonomous extends LinearOpMode {
         armMotor = hardwareMap.get(DcMotorEx.class, "arm_motor");
         BNO055IMUNew IMU = hardwareMap.get(BNO055IMUNew.class, "imu");
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
-        grabServo = hardwareMap.get(Servo.class, "grab_servo");
+        myServoL = hardwareMap.get(Servo.class, "grab_servo_L");
+        myServoR = hardwareMap.get(Servo.class, "grab_servo_R");
         //MintGrabber.init(grabServo);
 
         posn = new Positioning(IMU, telemetry);
@@ -126,15 +129,16 @@ public abstract class MintAutonomous extends LinearOpMode {
         t.reset();
 
         while (opModeIsActive()) {
-            if (t.milliseconds() > 4000) {
-                grabServo.setPosition(MintGrabber.OPEN_POSITION);
+            if (t.milliseconds() > 4500) {
+                myServoL.setPosition(MintGrabber.CLOSED_POSITION);
+                myServoR.setPosition(MintGrabber.OPEN_POSITION);
             }
 
             if (t.milliseconds() > 5000) {
                 break;
             }
 
-            armMotor.setTargetPosition(-370);
+            armMotor.setTargetPosition(-400);
             armMotor.setPower(.5);
             armMotor.setMode(RUN_TO_POSITION);
             sleep(1);
@@ -143,14 +147,15 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     public void retractArm() {
         wristServo.setPosition(0.1);
-        grabServo.setPosition(MintGrabber.CLOSED_POSITION);
+        myServoL.setPosition(MintGrabber.OPEN_POSITION);
+        myServoR.setPosition(MintGrabber.CLOSED_POSITION);
 
         ElapsedTime t = new ElapsedTime();
         t.reset();
 
         while (opModeIsActive()) {
             if (t.milliseconds() < 2000) {
-                armMotor.setTargetPosition(-370);
+                armMotor.setTargetPosition(-400);
                 armMotor.setPower(.5);
                 armMotor.setMode(RUN_TO_POSITION);
                 sleep(1);

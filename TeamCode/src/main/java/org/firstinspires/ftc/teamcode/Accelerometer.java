@@ -27,7 +27,7 @@ public class Accelerometer {
         fitter.sample(t * t, t, degrees);
         BilinearFunc fit = fitter.fit(false);
         if (fit != null) {
-            accel = fit.beta0 * fit.beta0;
+            accel = 2 * fit.beta0;
         }
     }
 }
