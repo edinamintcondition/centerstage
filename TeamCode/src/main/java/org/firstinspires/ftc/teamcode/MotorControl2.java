@@ -60,7 +60,7 @@ public class MotorControl2 {
         } else if (Math.abs(targetSpeed - s) < speedTol) {
             torqueFrac = cruiseTorqueFrac;
         } else if (Math.signum(targetSpeed) != Math.signum(s)) {
-            torqueFrac = deccelTorqueFrac;
+            torqueFrac = -deccelTorqueFrac;
         } else {
             if (Math.abs(targetSpeed) > Math.abs(s))
                 torqueFrac = accelTorqueFrac;
