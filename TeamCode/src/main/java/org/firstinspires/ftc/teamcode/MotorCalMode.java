@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import android.annotation.SuppressLint;
 
@@ -49,16 +47,16 @@ public class MotorCalMode extends LinearOpMode {
         telemetry.addData("test", "motor acceleration");
         telemetry.addData("v start", "%.2f", startVolts);
         telemetry.update();
+        sleep(2000);
 
-        double[] aScale = new double[]{1, 1, 1, 1};
         double[] avgAccel = new double[4];
         int nTest = 6;
-        double tgtSpeed = 400;
-        for (int test = 0; test < nTest; test++) {
+        double tgtSpeed = 300;
+        for (int test = 0; test < 6; test++) {
             double[] accel = testAccel(tc, tgtSpeed);
-            for (int i = 0; i < 4; i++)
-                avgAccel[i] += Math.abs(accel[i]) / nTest;
-            dump(motors, accelVolts, accel);
+            if (tgtSpeed > 0)
+                for (int i = 0; i < 4; i++)
+                    avgAccel[i] += Math.abs(accel[i]) * 2 / nTest;
 
             sleep(1000);
 
@@ -66,12 +64,30 @@ public class MotorCalMode extends LinearOpMode {
         }
 
         for (int i = 0; i < 4; i++)
-            telemetry.addData("accel" + i, "%.2f", avgAccel[i], avg(avgAccel) / avgAccel[i]);
+            telemetry.addData("accel" + i, "a = %.2f, mult = %.4f", avgAccel[i], avg(avgAccel) / avgAccel[i]);
+        telemetry.addData("average accel", "%.4f", avg(avgAccel));
         telemetry.update();
 
-        sleep(1000);
+        sleep(4000);
 
-        testSpeed(tc, tgtSpeed / 2);
+        double[] avgDeccel = new double[4];
+        for (int test = 0; test < nTest; test++) {
+            double[] deccel = testDeccel(tc, tgtSpeed);
+            if (tgtSpeed > 0)
+                for (int i = 0; i < 4; i++)
+                    avgDeccel[i] += Math.abs(deccel[i]) * 2 / nTest;
+
+            sleep(1000);
+
+            tgtSpeed = -tgtSpeed;
+        }
+
+        for (int i = 0; i < 4; i++)
+            telemetry.addData("deccel" + i, "a = %.2f, mult = %.4f", avgDeccel[i], avg(avgDeccel) / avgDeccel[i]);
+        telemetry.addData("average deccel", "%.4f", avg(avgDeccel));
+        telemetry.update();
+
+        sleep(4000);
 
         while (opModeIsActive()) {
             sleep(1);
@@ -97,7 +113,7 @@ public class MotorCalMode extends LinearOpMode {
             if (moved == 4)
                 break;
 
-            volt = t.seconds() / 2;
+            volt = t.seconds() / 5;
             if (volt > 12) throw new RuntimeException("motor did not start");
 
             telemetry.addData("volt", "%.02f", volt);
@@ -123,35 +139,29 @@ public class MotorCalMode extends LinearOpMode {
 
         while (opModeIsActive()) {
             for (int i = 0; i < 4; i++)
-                a[i].sample(tc.get(0).getDeg());
+                a[i].sample(tc.get(i).getDeg());
 
             tc.run();
 
             for (int i = 0; i < 4; i++)
                 telemetry.addData("motor" + i, tc.get(i));
-
             telemetry.addData("speed", "%.2f", tc.getDriveSpeed());
-
-            if (Math.abs(tc.getDriveSpeed() - tgtSpeed) < 10)
-                break;
-
             telemetry.update();
+
+            if (Math.abs(tc.getDriveSpeed()) > Math.abs(tgtSpeed))
+                break;
         }
 
-        double[] totalAccel = new double[4];
-        for (int i = 0; i < 4; i++) {
-            totalAccel[i] = a[i].getAccel();
-            telemetry.addData("accel" + i, "%.2f", totalAccel[i]);
-        }
-
-        telemetry.update();
+        double[] accel = new double[4];
+        for (int i = 0; i < 4; i++)
+            accel[i] = a[i].getAccel();
 
         stop(tc);
 
-        return totalAccel;
+        return accel;
     }
 
-    private double[] testSpeed(TractionControl tc, double tgtSpeed) {
+    private double[] testDeccel(TractionControl tc, double tgtSpeed) {
         Accelerometer[] a = new Accelerometer[4];
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
@@ -160,77 +170,32 @@ public class MotorCalMode extends LinearOpMode {
 
         while (opModeIsActive()) {
             tc.run();
+
             if (Math.abs(tc.getDriveSpeed() - tgtSpeed) < 10)
                 break;
         }
 
-        ElapsedTime t = new ElapsedTime();
+        tc.setTargetDriveSpeed(0);
+
         while (opModeIsActive()) {
             for (int i = 0; i < 4; i++)
-                a[i].sample(tc.get(0).getDeg());
+                a[i].sample(tc.get(i).getDeg());
 
             tc.run();
 
-            if (t.milliseconds() > 500)
+            if (Math.abs(tc.getDriveSpeed()) < 10)
                 break;
         }
 
-        double[] totalAccel = new double[4];
+        double[] deccel = new double[4];
         for (int i = 0; i < 4; i++) {
-            totalAccel[i] = a[i].getAccel();
-            telemetry.addData("accel" + i, "%.2f", totalAccel[i]);
+            deccel[i] = a[i].getAccel();
+            telemetry.addData("accel" + i, "%.2f", deccel[i]);
         }
 
         telemetry.update();
 
-        stop(tc);
-
-        return totalAccel;
-    }
-
-    private void speedTest(DcMotor[] m, double[] volts) {
-        Speedometer[] s = new Speedometer[4];
-        Accelerometer[] a = new Accelerometer[4];
-        for (int i = 0; i < 4; i++) {
-            s[i] = new Speedometer(25);
-            a[i] = new Accelerometer(25);
-            m[i].setMode(RUN_WITHOUT_ENCODER);
-            m[i].setPower(volts[i] / vs.getVoltage());
-        }
-
-        ElapsedTime t = new ElapsedTime();
-        while (opModeIsActive()) {
-            for (int i = 0; i < 4; i++) {
-                double motorCurrDeg = mConf.toDeg(m[i].getCurrentPosition());
-                s[i].sample(motorCurrDeg);
-                a[i].sample(motorCurrDeg);
-
-                telemetry.addData("accel" + i, "%.1f", a[i].getAccel());
-            }
-
-            if (t.milliseconds() > 1500)
-                break;
-
-            telemetry.update();
-        }
-
-        stopAll(m);
-
-        double[] speed = new double[4];
-        for (int i = 0; i < 4; i++) {
-            speed[i] = s[i].getSpeed();
-            telemetry.addData("speed" + i, "%.1f", s[i].getSpeed());
-        }
-
-        telemetry.update();
-    }
-
-    private void stopAll(DcMotor[] m) {
-        for (int i = 0; i < 4; i++) {
-            m[i].setZeroPowerBehavior(BRAKE);
-            m[i].setMode(RUN_USING_ENCODER);
-            m[i].setPower(0);
-        }
+        return deccel;
     }
 
     private void stop(TractionControl tc) {
@@ -238,10 +203,14 @@ public class MotorCalMode extends LinearOpMode {
             tc.get(i).setTargetSpeed(0);
 
         while (opModeIsActive()) {
-            if (Math.abs(tc.getDriveSpeed()) < 10)
-                break;
-
             tc.run();
+
+            for (int i = 0; i < 4; i++)
+                telemetry.addData("motor"+i,tc.get(i));
+            telemetry.update();
+
+            if (tc.isStopped())
+                break;
         }
     }
 
@@ -264,20 +233,9 @@ public class MotorCalMode extends LinearOpMode {
         throw new RuntimeException("no voltage sensor");
     }
 
-    private void rescale(double[] scale, double[] accel) {
-        double sum = 0;
-        for (int i = 0; i < 4; i++)
-            sum += accel[i];
-        double avg = sum / 4;
-
-        for (int i = 0; i < 4; i++)
-            scale[i] *= avg / accel[i];
-    }
-
     private double avg(double[] x) {
         double sum = 0;
-        for (int i = 0; i < x.length; i++)
-            sum += x[i];
+        for (double v : x) sum += v;
         return sum / x.length;
     }
 }

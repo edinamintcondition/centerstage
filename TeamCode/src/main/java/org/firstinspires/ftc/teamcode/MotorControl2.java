@@ -16,6 +16,7 @@ public class MotorControl2 {
     private final Speedometer speedo;
     private double targetSpeed, torqueFrac;
     private static final double speedTol = 10;
+    private static final double coastToStopTol = 90;
 
     public MotorControl2(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf) {
         this(motor, motorConf, vs, accelTf, coastTf, accelTf - coastTf);
@@ -43,6 +44,10 @@ public class MotorControl2 {
         return speedo.getSpeed();
     }
 
+    public boolean isStopped() {
+        return Math.abs(getSpeed()) < speedTol;
+    }
+
     public void setTargetSpeed(double t) {
         targetSpeed = t;
     }
@@ -52,26 +57,35 @@ public class MotorControl2 {
 
         double s = getSpeed();
 
-        if (Math.abs(s) < speedTol) {
-            if (targetSpeed == 0)
+        if (targetSpeed == 0) {
+            if (Math.abs(s) < coastToStopTol)
                 torqueFrac = 0;
+            else if (s > 0)
+                torqueFrac = deccelTorqueFrac;
             else
-                torqueFrac = accelTorqueFrac;
-        } else if (Math.abs(targetSpeed - s) < speedTol) {
-            torqueFrac = cruiseTorqueFrac;
-        } else if (Math.signum(targetSpeed) != Math.signum(s)) {
-            torqueFrac = -deccelTorqueFrac;
-        } else {
-            if (Math.abs(targetSpeed) > Math.abs(s))
+                torqueFrac = -deccelTorqueFrac;
+        } else if (targetSpeed > 0) {
+            if (Math.abs(s - targetSpeed) < speedTol)
+                torqueFrac = cruiseTorqueFrac;
+            else if (s < targetSpeed)
                 torqueFrac = accelTorqueFrac;
             else
                 torqueFrac = deccelTorqueFrac;
+        } else {
+            if (Math.abs(s - targetSpeed) < speedTol)
+                torqueFrac = -cruiseTorqueFrac;
+            else if (s < targetSpeed)
+                torqueFrac = -deccelTorqueFrac;
+            else
+                torqueFrac = -accelTorqueFrac;
         }
 
-        torqueFrac *= Math.signum(targetSpeed);
-
-        double volt = (torqueFrac + s / motorConf.topSpeed) * motorConf.nominalVolt;
-        motor.setPower(volt / vs.getVoltage());
+        if (torqueFrac == 0) {
+            motor.setPower(0);
+        } else {
+            double volt = (torqueFrac + s / motorConf.topSpeed) * motorConf.nominalVolt;
+            motor.setPower(volt / vs.getVoltage());
+        }
     }
 
     @NonNull
