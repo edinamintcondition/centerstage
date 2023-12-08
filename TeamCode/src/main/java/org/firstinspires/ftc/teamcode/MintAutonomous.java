@@ -124,8 +124,8 @@ public abstract class MintAutonomous extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (t.milliseconds() > 4500) {
-                myServoL.setPosition(MintGrabber.CLOSED_POSITION);
-                myServoR.setPosition(MintGrabber.OPEN_POSITION);
+                myServoL.setPosition(MintGrabber.CLOSED_POSITION_L);
+                myServoR.setPosition(MintGrabber.CLOSED_POSITION_R);
             }
 
             if (t.milliseconds() > 5000) {
@@ -141,8 +141,8 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     public void retractArm() {
         wristServo.setPosition(0.1);
-        myServoL.setPosition(MintGrabber.OPEN_POSITION);
-        myServoR.setPosition(MintGrabber.CLOSED_POSITION);
+        myServoL.setPosition(MintGrabber.OPEN_POSITION_L);
+        myServoR.setPosition(MintGrabber.OPEN_POSITION_R);
 
         ElapsedTime t = new ElapsedTime();
         t.reset();
