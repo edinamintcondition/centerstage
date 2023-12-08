@@ -84,6 +84,7 @@ public class MintGrabber {
         myServoL.setPosition(OPEN_POSITION_L); // open grabbers
         myServoR.setPosition(OPEN_POSITION_R);
         telemetry.addData(">", "Both grabs opening :O");
+
     }
 
     //left grabber
