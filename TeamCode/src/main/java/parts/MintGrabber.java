@@ -11,8 +11,10 @@ public class MintGrabber {
     //Constants
     String servoNameL = "grab_servo_L";
     String servoNameR = "grab_servo_R";
-    public static final double CLOSED_POSITION = 0.96;
-    public static final double OPEN_POSITION = 0.5;
+    public static final double CLOSED_POSITION_R = 0.96;
+    public static final double OPEN_POSITION_R = 0.3;
+    public static final double CLOSED_POSITION_L = 0.4;
+    public static final double OPEN_POSITION_L = 0.89;
 
     public static void init(Servo s) {
     }
@@ -61,7 +63,7 @@ public class MintGrabber {
         }
 
         //right grabber
-        if (gamepad.right_bumper && gamepad.dpad_right && !gamepad.dpad_left) {
+        if (gamepad.left_bumper && gamepad.dpad_right && !gamepad.dpad_left) {
             pressedButton = "left bumper + right dpad";
             closeGrabR();
         } else if (gamepad.right_bumper && gamepad.dpad_right && !gamepad.dpad_left) {
@@ -74,42 +76,43 @@ public class MintGrabber {
 
     //both grabbers
     public void closeGrabLR() {
-        myServoL.setPosition(CLOSED_POSITION); // close grabbers
-        myServoR.setPosition(OPEN_POSITION);
+        myServoL.setPosition(CLOSED_POSITION_L); // close grabbers
+        myServoR.setPosition(CLOSED_POSITION_R);
         telemetry.addData(">", "Both grabs closing :D");
     }
     public void openGrabLR() {
-        myServoL.setPosition(OPEN_POSITION); // open grabbers
-        myServoR.setPosition(CLOSED_POSITION);
+        myServoL.setPosition(OPEN_POSITION_L); // open grabbers
+        myServoR.setPosition(OPEN_POSITION_R);
         telemetry.addData(">", "Both grabs opening :O");
     }
 
     //left grabber
     public void closeGrabL() {
-        myServoL.setPosition(CLOSED_POSITION); //Closes left grabber
+        myServoL.setPosition(CLOSED_POSITION_L); //Closes left grabber
         telemetry.addData(">", "Left grabb closing");
     }
     public void openGrabL() {
-        myServoL.setPosition(OPEN_POSITION); //Opens left grabber
+        myServoL.setPosition(OPEN_POSITION_L); //Opens left grabber
         telemetry.addData(">", "Left grabb opening");
     }
 
     //right grabber
     public void closeGrabR() {
-        myServoR.setPosition(OPEN_POSITION); //Closes right grabber
+        myServoR.setPosition(CLOSED_POSITION_R); //Closes right grabber
         telemetry.addData(">", "right grab closing");
     }
     public void openGrabR() {
-        myServoR.setPosition(CLOSED_POSITION); //Opens right grabber
+        myServoR.setPosition(OPEN_POSITION_R); //Opens right grabber
         telemetry.addData(">", "right grab opening");
     }
 
     public void printPosition() {
-        telemetry.addData("Grabber " + myServoL.getDeviceName(), myServoL.getPosition());
+        telemetry.addData("Grabber L " + myServoL.getDeviceName(), myServoL.getPosition());
+        telemetry.addData("Grabber R " + myServoR.getDeviceName(), myServoR.getPosition());
     }
 
     public void stop() {
-        myServoL.setPosition(OPEN_POSITION); // stops rotation
+        myServoL.setPosition(OPEN_POSITION_R); // stops rotation
     }
 
     public void start() {

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import parts.MintGrabber;
 
-@Disabled
+@TeleOp
 public class ServoTest extends LinearOpMode {
 
     @Override
@@ -30,13 +30,10 @@ public class ServoTest extends LinearOpMode {
 
             if (gamepad2.left_bumper) {
                 button = "closing";
-                wait((long)0.5);
             } else if (gamepad2.right_bumper) {
                 button = "opening";
-                wait((long) 0.5);
             } else {
                 button = "being silly";
-                wait((long)0.5);
             }
 
             telemetry.addData("<", "the claw is " + button + " >:3");

@@ -12,14 +12,8 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Point;
-import org.firstinspires.ftc.teamcode.Position;
-import org.firstinspires.ftc.teamcode.Positioning;
-
-import parts.MintWrist;
 import parts.MintGrabber;
-import parts.MintArm;
-import parts.MintCamera;
+
 public abstract class MintAutonomous extends LinearOpMode {
 
     double gearRatio = 20;
@@ -127,7 +121,7 @@ public abstract class MintAutonomous extends LinearOpMode {
 
         while (opModeIsActive()) {
             if (t.milliseconds() > 4000) {
-                grabServo.setPosition(MintGrabber.OPEN_POSITION);
+                grabServo.setPosition(MintGrabber.OPEN_POSITION_R);
             }
 
             if (t.milliseconds() > 5000) {
@@ -143,7 +137,7 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     public void retractArm() {
         wristServo.setPosition(0.1);
-        grabServo.setPosition(MintGrabber.CLOSED_POSITION);
+        grabServo.setPosition(MintGrabber.CLOSED_POSITION_R);
 
         ElapsedTime t = new ElapsedTime();
         t.reset();
