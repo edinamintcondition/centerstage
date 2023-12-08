@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import parts.MintArm;
+import parts.MintLauncher;
 import parts.MintWheels;
 import parts.MintGrabber;
 import parts.MintWrist;
@@ -15,6 +16,7 @@ public class MintTeleOp extends LinearOpMode {
     public void runOpMode() {
         //Gamepad 1
         MintWheels wheels = new MintWheels(hardwareMap, gamepad1, telemetry);
+        MintLauncher launcher = new MintLauncher(hardwareMap, gamepad1, telemetry);
 
         //Gamepad 2
         MintArm arm = new MintArm(hardwareMap, gamepad2, telemetry);
@@ -35,6 +37,8 @@ public class MintTeleOp extends LinearOpMode {
             arm.run();
 
             wrist.run();
+
+            launcher.run();
 
             grabber.run();
             grabber.printPosition();

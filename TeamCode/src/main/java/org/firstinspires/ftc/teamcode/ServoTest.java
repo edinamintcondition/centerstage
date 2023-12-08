@@ -14,7 +14,7 @@ public class ServoTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         String button = "nothing";
-        MintLauncher launcher = new MintLauncher(hardwareMap);
+        MintLauncher launcher = new MintLauncher(hardwareMap, gamepad1, telemetry);
 
         //Start OpMode
         waitForStart();
