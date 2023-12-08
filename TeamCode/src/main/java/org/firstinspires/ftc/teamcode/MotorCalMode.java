@@ -21,28 +21,13 @@ public class MotorCalMode extends LinearOpMode {
     public void runOpMode() {
         getVs();
 
-        DcMotor leftFront = hardwareMap.get(DcMotor.class, "front_left_motor");
-        DcMotor rightFront = hardwareMap.get(DcMotor.class, "front_right_motor");
-        DcMotor leftBack = hardwareMap.get(DcMotor.class, "back_left_motor");
-        DcMotor rightBack = hardwareMap.get(DcMotor.class, "back_right_motor");
-
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        DcMotor[] motors = new DcMotor[]{leftFront, leftBack, rightFront, rightBack};
-
-        double accelVolts = 1.26;
-        double torqueFrac = accelVolts / 12;
-
-        TractionControl tc = new TractionControl(motors, vs);
+        TractionControl tc = new TractionControl(hardwareMap, vs);
         waitForStart();
 
         telemetry.addData("test", "motor starting voltage");
         telemetry.update();
 
-        double startVolts = testStartVolts(motors);
+        double startVolts = testStartVolts(tc.getMotors());
 
         telemetry.addData("test", "motor acceleration");
         telemetry.addData("v start", "%.2f", startVolts);
@@ -206,7 +191,7 @@ public class MotorCalMode extends LinearOpMode {
             tc.run();
 
             for (int i = 0; i < 4; i++)
-                telemetry.addData("motor"+i,tc.get(i));
+                telemetry.addData("motor" + i, tc.get(i));
             telemetry.update();
 
             if (tc.isStopped())
