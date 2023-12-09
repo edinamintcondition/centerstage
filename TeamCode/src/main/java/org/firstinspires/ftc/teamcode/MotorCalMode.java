@@ -27,25 +27,25 @@ public class MotorCalMode extends LinearOpMode {
         telemetry.addData("test", "motor starting voltage");
         telemetry.update();
 
-        double startVolts = testStartVolts(tc.getMotors());
-
-        telemetry.addData("test", "motor acceleration");
-        telemetry.addData("v start", "%.2f", startVolts);
-        telemetry.update();
-        sleep(2000);
+//        double startVolts = testStartVolts(tc.getMotors());
+//        telemetry.addData("test", "motor acceleration");
+//        telemetry.addData("v start", "%.2f", startVolts);
+//        telemetry.update();
+//        sleep(2000);
 
         double[] avgAccel = new double[4];
-        int nTest = 6;
+        int nTest = 3;
+        boolean strafe = false;
         double tgtSpeed = 300;
         for (int test = 0; test < 6; test++) {
-            double[] accel = testAccel(tc, tgtSpeed);
-            if (tgtSpeed > 0)
-                for (int i = 0; i < 4; i++)
-                    avgAccel[i] += Math.abs(accel[i]) * 2 / nTest;
+            double[] accel = testAccel(tc, tgtSpeed, strafe);
+            for (int i = 0; i < 4; i++)
+                avgAccel[i] += Math.abs(accel[i]) / nTest;
 
             sleep(1000);
 
-            tgtSpeed = -tgtSpeed;
+            testAccel(tc, -tgtSpeed, strafe);
+            sleep(1000);
         }
 
         for (int i = 0; i < 4; i++)
@@ -57,14 +57,14 @@ public class MotorCalMode extends LinearOpMode {
 
         double[] avgDeccel = new double[4];
         for (int test = 0; test < nTest; test++) {
-            double[] deccel = testDeccel(tc, tgtSpeed);
-            if (tgtSpeed > 0)
-                for (int i = 0; i < 4; i++)
-                    avgDeccel[i] += Math.abs(deccel[i]) * 2 / nTest;
+            double[] deccel = testDeccel(tc, tgtSpeed, strafe);
+            for (int i = 0; i < 4; i++)
+                avgDeccel[i] += Math.abs(deccel[i]) / nTest;
 
             sleep(1000);
 
-            tgtSpeed = -tgtSpeed;
+            testDeccel(tc, -tgtSpeed, strafe);
+            sleep(1000);
         }
 
         for (int i = 0; i < 4; i++)
@@ -115,25 +115,28 @@ public class MotorCalMode extends LinearOpMode {
         return volt;
     }
 
-    private double[] testAccel(TractionControl tc, double tgtSpeed) {
+    private double[] testAccel(TractionControl tc, double tgtSpeed, boolean strafe) {
         Accelerometer[] a = new Accelerometer[4];
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
 
-        tc.setTargetDriveSpeed(tgtSpeed);
+        if (strafe)
+            tgtSpeed *= 3;
+
+        tc.setTargetSpeed(tgtSpeed, strafe);
 
         while (opModeIsActive()) {
             for (int i = 0; i < 4; i++)
                 a[i].sample(tc.get(i).getDeg());
 
-            tc.run();
+            tc.run(strafe);
 
             for (int i = 0; i < 4; i++)
                 telemetry.addData("motor" + i, tc.get(i));
-            telemetry.addData("speed", "%.2f", tc.getDriveSpeed());
+            telemetry.addData("speed", "%.2f", tc.getSpeed(strafe));
             telemetry.update();
 
-            if (Math.abs(tc.getDriveSpeed()) > Math.abs(tgtSpeed))
+            if (Math.abs(tc.getSpeed(strafe) - tgtSpeed) < 10)
                 break;
         }
 
@@ -141,34 +144,37 @@ public class MotorCalMode extends LinearOpMode {
         for (int i = 0; i < 4; i++)
             accel[i] = a[i].getAccel();
 
-        stop(tc);
+        stop(tc, strafe);
 
         return accel;
     }
 
-    private double[] testDeccel(TractionControl tc, double tgtSpeed) {
+    private double[] testDeccel(TractionControl tc, double tgtSpeed, boolean strafe) {
         Accelerometer[] a = new Accelerometer[4];
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
 
-        tc.setTargetDriveSpeed(tgtSpeed);
+        if (strafe)
+            tgtSpeed *= 3;
+
+        tc.setTargetSpeed(tgtSpeed, strafe);
 
         while (opModeIsActive()) {
-            tc.run();
+            tc.run(strafe);
 
-            if (Math.abs(tc.getDriveSpeed() - tgtSpeed) < 10)
+            if (Math.abs(tc.getSpeed(strafe) - tgtSpeed) < 10)
                 break;
         }
 
-        tc.setTargetDriveSpeed(0);
+        tc.setTargetSpeed(0, strafe);
 
         while (opModeIsActive()) {
             for (int i = 0; i < 4; i++)
                 a[i].sample(tc.get(i).getDeg());
 
-            tc.run();
+            tc.run(strafe);
 
-            if (Math.abs(tc.getDriveSpeed()) < 10)
+            if (tc.isStopped())
                 break;
         }
 
@@ -183,12 +189,12 @@ public class MotorCalMode extends LinearOpMode {
         return deccel;
     }
 
-    private void stop(TractionControl tc) {
+    private void stop(TractionControl tc, boolean strafe) {
         for (int i = 0; i < 4; i++)
             tc.get(i).setTargetSpeed(0);
 
         while (opModeIsActive()) {
-            tc.run();
+            tc.run(strafe);
 
             for (int i = 0; i < 4; i++)
                 telemetry.addData("motor" + i, tc.get(i));
