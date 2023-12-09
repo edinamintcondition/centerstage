@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
+import androidx.annotation.NonNull;
+
+@SuppressLint("DefaultLocale")
 public final class Position {
     public double x, y, dx, dy, a;
 
@@ -9,6 +14,12 @@ public final class Position {
         this.a = a;
         this.dx = dx;
         this.dy = dy;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return String.format("%.2f,%.2f @%.2f", x, y, a);
     }
 
     public double dist(Position p) {

@@ -181,8 +181,15 @@ public abstract class MintAutonomous extends LinearOpMode {
     }
 
     public void driveToClosestPoint(Point target) {
-        for (DcMotor m : motors)
-            m.setMode(RUN_WITHOUT_ENCODER);
+        for (DcMotor m : motors) {
+            m.setMode(STOP_AND_RESET_ENCODER);
+        }
+
+        sleep(10);
+
+        for (DcMotor m : motors) {
+            m.setMode(RUN_USING_ENCODER);
+        }
 
         Position initPos = currentPos;
         double tgtDist = currentPos.toRobotRel(target).y;
@@ -204,15 +211,26 @@ public abstract class MintAutonomous extends LinearOpMode {
             }
         }
 
+        driveToStop(false);
+
         this.currentPos = initPos.addRobotRel(new Point(0, tgtDist));
 
         telemetry.addData("drive done", this.currentPos);
         pause();
     }
 
+    private void driveToStop(boolean strafe) {
+        tc.setTargetSpeed(0, strafe);
+        while (opModeIsActive()) {
+            tc.run(strafe);
+            if (tc.isStopped())
+                break;
+        }
+    }
+
     public void strafeToClosestPoint(Point target) { // extract method with driveToClosestPoint
         for (DcMotor m : motors)
-            m.setMode(RUN_WITHOUT_ENCODER);
+            m.setMode(RUN_USING_ENCODER);
 
         Position initPos = currentPos;
         double tgtDist = currentPos.toRobotRel(target).x;
@@ -231,6 +249,8 @@ public abstract class MintAutonomous extends LinearOpMode {
             }
         }
 
+        driveToStop(false);
+
         this.currentPos = initPos.addRobotRel(new Point(tgtDist, 0));
 
         telemetry.addData("strafe done", this.currentPos);
@@ -238,8 +258,17 @@ public abstract class MintAutonomous extends LinearOpMode {
     }
 
     public void rotateToHeading(double targetHeading) {
-        for (DcMotor m : motors)
+        for (DcMotor m : motors) {
+            m.setMode(STOP_AND_RESET_ENCODER);
+        }
+
+        sleep(5);
+
+        for (DcMotor m : motors) {
             m.setMode(RUN_USING_ENCODER);
+        }
+
+        sleep(5);
 
         double ppd = 537.0 / 63.15;
         ppd = ppd * (gearRatio / 20);
@@ -261,7 +290,6 @@ public abstract class MintAutonomous extends LinearOpMode {
                 telemetry.addData("rotate", targetAngle);
                 telemetry.update();
 
-
                 for (DcMotor m : motors) {
                     int p = m.getCurrentPosition();
                     if (m.getDirection() == DcMotorSimple.Direction.FORWARD) {
@@ -277,6 +305,12 @@ public abstract class MintAutonomous extends LinearOpMode {
                 break;
             }
         }
+
+        for (DcMotor m : motors) {
+            m.setMode(STOP_AND_RESET_ENCODER);
+        }
+
+        sleep(5);
     }
 
     public boolean areIdle() {

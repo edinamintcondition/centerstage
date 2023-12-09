@@ -132,31 +132,27 @@ public class TractionControl {
         double d = getDeg(strafe);
         double tgtDeg = mc.dpi * targetPos;
 
-        boolean done;
         if (d >= tgtDeg) {
             setTargetSpeed(0, strafe);
-            done = isStopped();
-        } else {
-
-            double tgtSpeed;
-            double cutoff = tgtDeg + 0.5 * s * s / mc.deccel;
-            if (d >= cutoff) tgtSpeed = 0;
-            else tgtSpeed = mc.maxSpeed;
-
-            for (int i = 0; i < 4; i++)
-                telemetry.addData("motor" + i, get(i));
-            telemetry.addData("pos", d / mc.dpi);
-            telemetry.addData("tgtSpeed", tgtSpeed);
-            telemetry.update();
-
-            setTargetSpeed(tgtSpeed, strafe);
-
-            done = false;
+            return true;
         }
+
+        double tgtSpeed;
+        double cutoff = tgtDeg + 0.5 * s * s / mc.deccel;
+        if (d >= cutoff) tgtSpeed = 0;
+        else tgtSpeed = mc.maxSpeed;
+
+        for (int i = 0; i < 4; i++)
+            telemetry.addData("motor" + i, get(i));
+        telemetry.addData("pos", d / mc.dpi);
+        telemetry.addData("tgtSpeed", tgtSpeed);
+        telemetry.update();
+
+        setTargetSpeed(tgtSpeed, strafe);
 
         run(strafe);
 
-        return done;
+        return false;
     }
 
     public boolean runBackTo(double targetPos, boolean strafe) { // combine with runFwdTo
@@ -168,30 +164,26 @@ public class TractionControl {
         double d = getDeg(strafe);
         double tgtDeg = mc.dpi * targetPos;
 
-        boolean done;
         if (d <= tgtDeg) {
             setTargetSpeed(0, strafe);
-            done = true;
-        } else {
-
-            double tgtSpeed;
-            double cutoff = tgtDeg - 0.5 * s * s / mc.deccel;
-            if (d <= cutoff) tgtSpeed = 0;
-            else tgtSpeed = -mc.maxSpeed;
-
-            for (int i = 0; i < 4; i++)
-                telemetry.addData("motor" + i, get(i));
-            telemetry.addData("pos", d / mc.dpi);
-            telemetry.addData("tgtSpeed", tgtSpeed);
-            telemetry.update();
-
-            setTargetSpeed(tgtSpeed, strafe);
-
-            done = false;
+            return true;
         }
+
+        double tgtSpeed;
+        double cutoff = tgtDeg - 0.5 * s * s / mc.deccel;
+        if (d <= cutoff) tgtSpeed = 0;
+        else tgtSpeed = -mc.maxSpeed;
+
+        for (int i = 0; i < 4; i++)
+            telemetry.addData("motor" + i, get(i));
+        telemetry.addData("pos", d / mc.dpi);
+        telemetry.addData("tgtSpeed", tgtSpeed);
+        telemetry.update();
+
+        setTargetSpeed(tgtSpeed, strafe);
 
         run(strafe);
 
-        return done;
+        return false;
     }
 }
