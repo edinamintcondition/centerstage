@@ -7,9 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import parts.MintGrabber;
 import parts.MintLauncher;
 
-
-//@Disabled
-
+@Disabled
 @TeleOp
 public class ServoTest extends LinearOpMode {
     @Override

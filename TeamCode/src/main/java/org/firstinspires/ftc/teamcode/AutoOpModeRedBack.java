@@ -15,7 +15,7 @@ public class AutoOpModeRedBack extends MintAutonomous {
         rotateToHeading(0);
     }
     public void park() {
-        Point p = new Point(currentPos.x + 12, currentPos.y - 6);
+        Point p = new Point(currentPos.x + parkX, currentPos.y - 6);
         driveToClosestPoint(p);
         strafeToClosestPoint(p);
     }

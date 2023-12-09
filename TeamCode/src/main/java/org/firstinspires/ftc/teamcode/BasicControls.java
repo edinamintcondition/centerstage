@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import parts.MintWheels;
 
 @TeleOp
-//@Disabled
+@Disabled
 public class BasicControls extends LinearOpMode {
     @Override
     public void runOpMode() {

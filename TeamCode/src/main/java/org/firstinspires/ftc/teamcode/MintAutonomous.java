@@ -19,11 +19,12 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 import parts.MintGrabber;
+import parts.MintWrist;
 
 public abstract class MintAutonomous extends LinearOpMode {
 
     double gearRatio = 20;
-    boolean useAprilTags;
+    boolean useAprilTags = true;
 
     Positioning posn;
 
@@ -39,8 +40,9 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     Servo myServoR;
 
-    protected final static double frontStartX = 4, backStartX = 8.5, frontCentralX = frontStartX + 50, backboardX = 36;
+    protected final static double frontStartX = 4, backStartX = 8.5, frontCentralX = frontStartX + 56, backboardX = 36;
     protected final static double frontStartY = 32, backStartY = 84, approachY = 112;
+    protected final static double parkX = 22;
 
     public MintAutonomous(Position initPos) {
         currentPos = initPos;
@@ -63,7 +65,6 @@ public abstract class MintAutonomous extends LinearOpMode {
         //MintGrabber.init(grabServo);
 
         posn = new Positioning(IMU, telemetry);
-
 
         WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
         VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, posn.myAprilTagProc);
@@ -93,7 +94,11 @@ public abstract class MintAutonomous extends LinearOpMode {
         posn.resetPosition();
         //grabServo.setPosition(MintGrabber.CLOSED_POSITION);
 
+        wristServo.setPosition(MintWrist.FLAT_POSITION);
         driveToBackboard();
+        pause();
+
+        liftArm();
         pause();
 
         Position p = posn.getRelPosition(currentPos);
@@ -101,7 +106,7 @@ public abstract class MintAutonomous extends LinearOpMode {
             telemetry.addData("see april tag", "to drop pixel");
             telemetry.update();
 
-            sleep(500);
+            sleep(200);
 
             Point tgt = new Point(p.x, p.y - 9);
             strafeToClosestPoint(tgt);
@@ -114,8 +119,6 @@ public abstract class MintAutonomous extends LinearOpMode {
         pause();
 
         dropPixel();
-        retractArm();
-        pause();
         park();
     }
 
@@ -123,25 +126,44 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     public abstract void park();
 
-    public void dropPixel() {
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    public void liftArm() {
+        wristServo.setPosition(MintWrist.DROP_POSITION);
 
-        wristServo.setPosition(0.7);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         ElapsedTime t = new ElapsedTime();
         t.reset();
 
         while (opModeIsActive()) {
-            if (t.milliseconds() > 4500) {
-                myServoL.setPosition(MintGrabber.CLOSED_POSITION_L);
-                myServoR.setPosition(MintGrabber.CLOSED_POSITION_R);
-            }
-
-            if (t.milliseconds() > 5000) {
+            if (t.milliseconds() > 2000) {
                 break;
             }
 
-            armMotor.setTargetPosition(-400);
+            armMotor.setTargetPosition(-500);
+            armMotor.setPower(.5);
+            armMotor.setMode(RUN_TO_POSITION);
+            sleep(1);
+        }
+    }
+
+    public void dropPixel() {
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        ElapsedTime t = new ElapsedTime();
+        t.reset();
+
+        double delay = 500;
+        while (opModeIsActive()) {
+            if (t.milliseconds() > delay) {
+                myServoL.setPosition(MintGrabber.OPEN_POSITION_L);
+                myServoR.setPosition(MintGrabber.OPEN_POSITION_R);
+            }
+
+            if (t.milliseconds() > delay + 500) {
+                break;
+            }
+
+            armMotor.setTargetPosition(-500);
             armMotor.setPower(.5);
             armMotor.setMode(RUN_TO_POSITION);
             sleep(1);
@@ -149,35 +171,35 @@ public abstract class MintAutonomous extends LinearOpMode {
     }
 
     public void retractArm() {
-        wristServo.setPosition(0.1);
-        myServoL.setPosition(MintGrabber.OPEN_POSITION_L);
-        myServoR.setPosition(MintGrabber.OPEN_POSITION_R);
+        wristServo.setPosition(MintWrist.RETRACTED_POS);
+        myServoL.setPosition(MintGrabber.CLOSED_POSITION_L);
+        myServoR.setPosition(MintGrabber.CLOSED_POSITION_R);
 
-        ElapsedTime t = new ElapsedTime();
-        t.reset();
-
-        while (opModeIsActive()) {
-            if (t.milliseconds() < 2000) {
-                armMotor.setTargetPosition(-400);
-                armMotor.setPower(.5);
-                armMotor.setMode(RUN_TO_POSITION);
-                sleep(1);
-            } else if (t.milliseconds() > 3000) {
-                break;
-            } else {
-                armMotor.setTargetPosition(-100);
-                armMotor.setPower(.5);
-                armMotor.setMode(RUN_TO_POSITION);
-                sleep(1);
-            }
-        }
+//        ElapsedTime t = new ElapsedTime();
+//        t.reset();
+//
+//        while (opModeIsActive()) {
+//            if (t.milliseconds() < 2000) {
+//                armMotor.setTargetPosition(-400);
+//                armMotor.setPower(.5);
+//                armMotor.setMode(RUN_TO_POSITION);
+//                sleep(1);
+//            } else if (t.milliseconds() > 3000) {
+//                break;
+//            } else {
+//                armMotor.setTargetPosition(-100);
+//                armMotor.setPower(.5);
+//                armMotor.setMode(RUN_TO_POSITION);
+//                sleep(1);
+//            }
+//        }
     }
 
     public void pause() {
         telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
         telemetry.update();
 
-        sleep(1500);
+        sleep(500);
     }
 
     public void driveToClosestPoint(Point target) {
@@ -256,7 +278,7 @@ public abstract class MintAutonomous extends LinearOpMode {
     }
 
     public void rotateToHeading(double targetHeading) {
-                double ppd = 537.0 / 63.15;
+        double ppd = 537.0 / 63.15;
         ppd = ppd * (gearRatio / 20);
 
         while (opModeIsActive()) {
