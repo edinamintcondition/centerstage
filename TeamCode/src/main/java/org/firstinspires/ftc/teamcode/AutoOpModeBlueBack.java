@@ -9,9 +9,9 @@ public class AutoOpModeBlueBack extends MintAutonomous {
     }
 
     public void driveToBackboard() {
-        strafeToClosestPoint(new Point(backboardX, backStartY));
-        rotateToHeading(0);
         driveToClosestPoint(new Point(backboardX, approachY));
+        rotateToHeading(0);
+        strafeToClosestPoint(new Point(backboardX, backStartY));
         rotateToHeading(0);
     }
 

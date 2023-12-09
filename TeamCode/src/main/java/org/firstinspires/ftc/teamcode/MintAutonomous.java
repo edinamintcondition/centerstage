@@ -40,7 +40,7 @@ public abstract class MintAutonomous extends LinearOpMode {
 
     Servo myServoR;
 
-    protected final static double frontStartX = 4, backStartX = 8.5, frontCentralX = frontStartX + 56, backboardX = 36;
+    protected final static double frontStartX = 4, backStartX = 8.5, frontCentralX = frontStartX + 56, backboardX = 33;
     protected final static double frontStartY = 32, backStartY = 84, approachY = 112;
     protected final static double parkX = 22;
 
@@ -94,6 +94,8 @@ public abstract class MintAutonomous extends LinearOpMode {
         posn.resetPosition();
         //grabServo.setPosition(MintGrabber.CLOSED_POSITION);
 
+        myServoL.setPosition(MintGrabber.CLOSED_POSITION_L);
+        myServoL.setPosition(MintGrabber.OPEN_POSITION_R);
         wristServo.setPosition(MintWrist.FLAT_POSITION);
         driveToBackboard();
         pause();
@@ -108,7 +110,7 @@ public abstract class MintAutonomous extends LinearOpMode {
 
             sleep(200);
 
-            Point tgt = new Point(p.x, p.y - 9);
+            Point tgt = new Point(p.x, p.y - 8.5);
             strafeToClosestPoint(tgt);
             pause();
             driveToClosestPoint(tgt);
@@ -118,6 +120,7 @@ public abstract class MintAutonomous extends LinearOpMode {
         }
         pause();
 
+        retractArm();
         dropPixel();
         park();
     }
