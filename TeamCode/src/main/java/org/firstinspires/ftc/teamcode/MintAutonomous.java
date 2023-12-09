@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 import com.qualcomm.hardware.bosch.BNO055IMUNew;
@@ -10,7 +11,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import parts.MintGrabber;
 
@@ -40,6 +45,8 @@ public abstract class MintAutonomous extends LinearOpMode {
         currentPos = initPos;
     }
 
+    TractionControl tc;
+
     @Override
     public void runOpMode() {
         DcMotorEx leftFront = hardwareMap.get(DcMotorEx.class, "front_left_motor");
@@ -51,14 +58,15 @@ public abstract class MintAutonomous extends LinearOpMode {
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         myServoL = hardwareMap.get(Servo.class, "grab_servo_L");
         myServoR = hardwareMap.get(Servo.class, "grab_servo_R");
+        tc = new TractionControl(hardwareMap, telemetry, getVs());
         //MintGrabber.init(grabServo);
 
         posn = new Positioning(IMU, telemetry);
 
-        /*
+
         WebcamName camera1 = hardwareMap.get(WebcamName.class, "Webcam 1");
         VisionPortal myVisionPort = VisionPortal.easyCreateWithDefaults(camera1, posn.myAprilTagProc);
-        */
+
 
         leftFront.setDirection(DcMotorSimple.Direction.FORWARD);
         leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -168,122 +176,51 @@ public abstract class MintAutonomous extends LinearOpMode {
         telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
         telemetry.update();
 
-        sleep(100);
+        sleep(1500);
     }
 
     public void driveToClosestPoint(Point target) {
-        double ppi = 537.0 * 5 / 55.9;
-        ppi = ppi * (gearRatio / 20);
-        double fastLimit = 10;
+        for (DcMotor m : motors)
+            m.setMode(RUN_WITHOUT_ENCODER);
 
-        Position updatedPos = null;
+        Position initPos = currentPos;
+        double tgtDist = currentPos.toRobotRel(target).y;
 
-        while (opModeIsActive()) {
-            Position newCurPos = posn.getPosition();
-            if (newCurPos != null) {
-                this.currentPos = newCurPos;
-                updatedPos = null;
-            }
+        if (Math.abs(tgtDist) < 0.1) return;
 
-            if (updatedPos == null) {
-                double targetDist = currentPos.toRobotRel(target).y;
-                if (Math.abs(targetDist) < 0.1) {
-                    break;
-                }
-
-                if (newCurPos != null)
-                    telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
-                telemetry.addData("drive", targetDist);
-                pause();
-
-                updatedPos = currentPos.addRobotRel(new Point(0, targetDist));
-
-                int targetPos = (int) (targetDist * ppi);
-                double power = 0.5;
-
-                for (DcMotor m : motors) {
-                    int p = m.getCurrentPosition();
-                    m.setTargetPosition(p + targetPos);
-                    m.setPower(power);
-                    m.setMode(RUN_TO_POSITION);
-                }
-            }
-
-            if (areIdle()) { // shouldn't really happen
-                break;
-            }
-        }
+        tc.resetDeg();
 
         while (opModeIsActive()) {
-            if (areIdle()) {
-                break;
-            }
+            boolean done = tc.runTo(tgtDist, false);
+            if (done) break;
         }
 
-        if (updatedPos != null) {
-            this.currentPos = updatedPos;
-        }
+        this.currentPos = initPos.addRobotRel(new Point(0, tgtDist));
+
+        telemetry.addData("drive done", this.currentPos);
+        pause();
     }
 
     public void strafeToClosestPoint(Point target) {
-        double fastLimit = 10;
-        double ppi = 56;
-        ppi = ppi * (gearRatio / 20);
+        for (DcMotor m : motors)
+            m.setMode(RUN_WITHOUT_ENCODER);
 
-        Position updatedPos = null;
+        Position initPos = currentPos;
+        double tgtDist = currentPos.toRobotRel(target).y;
 
-        while (opModeIsActive()) {
-            Position newCurPos = posn.getPosition();
-            if (newCurPos != null) {
-                this.currentPos = newCurPos;
-                updatedPos = null;
-            }
+        if (Math.abs(tgtDist) < 0.1) return;
 
-            if (updatedPos == null) {
-                double targetDist = currentPos.toRobotRel(target).x;
-                if (Math.abs(targetDist) < 0.1) {
-                    break;
-                }
-
-                if (newCurPos != null)
-                    telemetry.addData("april tag pos", "%f %f", newCurPos.x, newCurPos.y);
-                telemetry.addData("strafe", targetDist);
-                pause();
-
-                updatedPos = currentPos.addRobotRel(new Point(targetDist, 0));
-
-                int targetPos = (int) (targetDist * ppi);
-                double power = 0.5;
-
-                for (DcMotor m : fwdMotors) {
-                    int p = m.getCurrentPosition();
-                    m.setTargetPosition(p + targetPos);
-                    m.setPower(power);
-                    m.setMode(RUN_TO_POSITION);
-                }
-
-                for (DcMotor m : revMotors) {
-                    int p = m.getCurrentPosition();
-                    m.setTargetPosition(p - targetPos);
-                    m.setPower(power);
-                    m.setMode(RUN_TO_POSITION);
-                }
-            }
-
-            if (areIdle()) { // shouldn't really happen
-                break;
-            }
-        }
+        tc.resetDeg();
 
         while (opModeIsActive()) {
-            if (areIdle()) {
-                break;
-            }
+            boolean done = tc.runTo(tgtDist, true);
+            if (done) break;
         }
 
-        if (updatedPos != null) {
-            this.currentPos = updatedPos;
-        }
+        this.currentPos = initPos.addRobotRel(new Point(0, tgtDist));
+
+        telemetry.addData("strafe done", this.currentPos);
+        pause();
     }
 
     public void rotateToHeading(double targetHeading) {
@@ -332,5 +269,13 @@ public abstract class MintAutonomous extends LinearOpMode {
             }
         }
         return true;
+    }
+
+    private VoltageSensor getVs() {
+        for (VoltageSensor vs : hardwareMap.voltageSensor) {
+            return vs;
+        }
+
+        throw new RuntimeException("no voltage sensor");
     }
 }

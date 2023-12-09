@@ -21,7 +21,7 @@ public class MotorCalMode extends LinearOpMode {
     public void runOpMode() {
         getVs();
 
-        TractionControl tc = new TractionControl(hardwareMap, vs);
+        TractionControl tc = new TractionControl(hardwareMap,telemetry, vs);
         waitForStart();
 
         telemetry.addData("test", "motor starting voltage");
