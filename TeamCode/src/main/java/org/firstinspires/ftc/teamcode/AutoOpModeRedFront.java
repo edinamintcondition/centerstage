@@ -10,7 +10,7 @@ public class AutoOpModeRedFront extends MintAutonomous {
     }
 
     public void driveToBackboard() {
-        driveToClosestPoint(new Point(currentPos.x, frontStartY - 24));
+        driveToClosestPoint(new Point(currentPos.x, frontStartY - 20));
         rotateToHeading(0);
         strafeToClosestPoint(new Point(144 - frontCentralX, frontStartY));
         rotateToHeading(0);

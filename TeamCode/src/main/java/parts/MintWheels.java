@@ -73,7 +73,7 @@ public class MintWheels {
             backwardPowerLimit = -0.2;
             telemetry.addData(">", "SLOOOW DOWN MATE");
         } else {
-            forwardPowerLimit = 0.6;
+            forwardPowerLimit = 0.45;
             backwardPowerLimit = -0.6;
             telemetry.addData(">", "normal speed :b");
         }
