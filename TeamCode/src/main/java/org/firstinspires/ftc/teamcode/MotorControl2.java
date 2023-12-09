@@ -15,7 +15,7 @@ public class MotorControl2 {
     private final double accelTorqueFrac, cruiseTorqueFrac, deccelTorqueFrac;
     private final Speedometer speedo;
     private double targetSpeed, torqueFrac, initPos;
-    private static final double speedTol = 10;
+    private static final double speedTol = 30;
     private static final double coastToStopTol = 90;
 
     public MotorControl2(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf) {

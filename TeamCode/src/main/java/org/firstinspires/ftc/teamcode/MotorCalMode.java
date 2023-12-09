@@ -35,9 +35,9 @@ public class MotorCalMode extends LinearOpMode {
 
         double[] avgAccel = new double[4];
         int nTest = 3;
-        boolean strafe = false;
+        boolean strafe = true;
         double tgtSpeed = 300;
-        for (int test = 0; test < 6; test++) {
+        for (int test = 0; test < nTest; test++) {
             double[] accel = testAccel(tc, tgtSpeed, strafe);
             for (int i = 0; i < 4; i++)
                 avgAccel[i] += Math.abs(accel[i]) / nTest;
@@ -120,9 +120,6 @@ public class MotorCalMode extends LinearOpMode {
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
 
-        if (strafe)
-            tgtSpeed *= 3;
-
         tc.setTargetSpeed(tgtSpeed, strafe);
 
         while (opModeIsActive()) {
@@ -153,9 +150,6 @@ public class MotorCalMode extends LinearOpMode {
         Accelerometer[] a = new Accelerometer[4];
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
-
-        if (strafe)
-            tgtSpeed *= 3;
 
         tc.setTargetSpeed(tgtSpeed, strafe);
 

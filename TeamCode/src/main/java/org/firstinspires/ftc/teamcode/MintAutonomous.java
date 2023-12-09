@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
@@ -188,11 +189,19 @@ public abstract class MintAutonomous extends LinearOpMode {
 
         if (Math.abs(tgtDist) < 0.1) return;
 
+        telemetry.addData("driving", tgtDist);
+        pause();
+
         tc.resetDeg();
 
         while (opModeIsActive()) {
-            boolean done = tc.runTo(tgtDist, false);
-            if (done) break;
+            if (tgtDist > 0) {
+                boolean done = tc.runForwardTo(tgtDist, false);
+                if (done) break;
+            } else {
+                boolean done = tc.runBackTo(tgtDist, false);
+                if (done) break;
+            }
         }
 
         this.currentPos = initPos.addRobotRel(new Point(0, tgtDist));
@@ -201,29 +210,37 @@ public abstract class MintAutonomous extends LinearOpMode {
         pause();
     }
 
-    public void strafeToClosestPoint(Point target) {
+    public void strafeToClosestPoint(Point target) { // extract method with driveToClosestPoint
         for (DcMotor m : motors)
             m.setMode(RUN_WITHOUT_ENCODER);
 
         Position initPos = currentPos;
-        double tgtDist = currentPos.toRobotRel(target).y;
+        double tgtDist = currentPos.toRobotRel(target).x;
 
         if (Math.abs(tgtDist) < 0.1) return;
 
         tc.resetDeg();
 
         while (opModeIsActive()) {
-            boolean done = tc.runTo(tgtDist, true);
-            if (done) break;
+            if (tgtDist > 0) {
+                boolean done = tc.runForwardTo(tgtDist, true);
+                if (done) break;
+            } else {
+                boolean done = tc.runBackTo(tgtDist, true);
+                if (done) break;
+            }
         }
 
-        this.currentPos = initPos.addRobotRel(new Point(0, tgtDist));
+        this.currentPos = initPos.addRobotRel(new Point(tgtDist, 0));
 
         telemetry.addData("strafe done", this.currentPos);
         pause();
     }
 
     public void rotateToHeading(double targetHeading) {
+        for (DcMotor m : motors)
+            m.setMode(RUN_USING_ENCODER);
+
         double ppd = 537.0 / 63.15;
         ppd = ppd * (gearRatio / 20);
 
