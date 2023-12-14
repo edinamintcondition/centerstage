@@ -29,7 +29,7 @@ public class MintLauncher {
             t = new ElapsedTime();
         }
 
-        if (t.seconds() > 120) {
+        if (t.seconds() > 90) {
             if (gamepad.dpad_up) {
                 launch();
                 telemetry.addData(">", "dpad up");
