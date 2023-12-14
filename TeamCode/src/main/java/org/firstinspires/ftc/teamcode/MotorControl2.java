@@ -62,6 +62,7 @@ public class MotorControl2 {
     }
 
     public void run(double speed) {
+        // if stopping, moving (combine last two)
         if (targetSpeed == 0) {
             if (Math.abs(speed) < coastToStopTol) torqueFrac = 0;
             else if (speed > 0) torqueFrac = deccelTorqueFrac;

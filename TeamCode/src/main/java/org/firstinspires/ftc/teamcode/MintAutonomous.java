@@ -130,7 +130,7 @@ public abstract class MintAutonomous extends LinearOpMode {
     public abstract void park();
 
     public void liftArm() {
-        wristServo.setPosition(MintWrist.DROP_POSITION+0.05);
+        wristServo.setPosition(MintWrist.DROP_POSITION+0.7);
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 

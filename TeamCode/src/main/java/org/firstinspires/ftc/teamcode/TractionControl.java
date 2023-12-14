@@ -14,6 +14,10 @@ import java.util.Arrays;
 public class TractionControl {
     private final MotorControl2[] mCon;
 
+    // organize calibrations
+    // don't need separate accel, deccel torque
+    // use calibration multipliers in different array
+
     //for 20:1
     private static final MoveCal driveCal = new MoveCal(15, 540, -585, 300);
     private static final MoveCal strafeCal = new MoveCal(15, 571, -1200, 300);
@@ -93,7 +97,7 @@ public class TractionControl {
         get(3).setTargetSpeed(t);
     }
 
-    public void resetDeg() {
+    public void resetDeg() { // prepMove, reset deg, read imu
         for (int i = 0; i < 4; i++)
             get(i).resetDeg();
     }
