@@ -8,9 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import parts.MintDrive;
 
 @Disabled
 @Autonomous
@@ -23,7 +24,7 @@ public class MotorCalMode extends LinearOpMode {
     public void runOpMode() {
         getVs();
 
-        TractionControl tc = new TractionControl(hardwareMap,telemetry, vs);
+        MintDrive tc = new MintDrive(hardwareMap,telemetry, vs);
         waitForStart();
 
         telemetry.addData("test", "motor starting voltage");
@@ -117,7 +118,7 @@ public class MotorCalMode extends LinearOpMode {
         return volt;
     }
 
-    private double[] testAccel(TractionControl tc, double tgtSpeed, boolean strafe) {
+    private double[] testAccel(MintDrive tc, double tgtSpeed, boolean strafe) {
         Accelerometer[] a = new Accelerometer[4];
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
@@ -148,7 +149,7 @@ public class MotorCalMode extends LinearOpMode {
         return accel;
     }
 
-    private double[] testDeccel(TractionControl tc, double tgtSpeed, boolean strafe) {
+    private double[] testDeccel(MintDrive tc, double tgtSpeed, boolean strafe) {
         Accelerometer[] a = new Accelerometer[4];
         for (int i = 0; i < 4; i++)
             a[i] = new Accelerometer(10000);
@@ -185,7 +186,7 @@ public class MotorCalMode extends LinearOpMode {
         return deccel;
     }
 
-    private void stop(TractionControl tc, boolean strafe) {
+    private void stop(MintDrive tc, boolean strafe) {
         for (int i = 0; i < 4; i++)
             tc.get(i).setTargetSpeed(0);
 

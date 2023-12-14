@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package parts;
 
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
@@ -8,11 +8,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.MotorConfig;
+import org.firstinspires.ftc.teamcode.MoveCal;
 
 import java.util.Arrays;
 
-public class TractionControl {
-    private final MotorControl2[] mCon;
+public class MintDrive {
+    private final MintMotor[] mCon;
 
     // organize calibrations
     // don't need separate accel, deccel torque
@@ -33,7 +35,7 @@ public class TractionControl {
 //    private static final double[] cruiseTorqueFrac = new double[]{1.24, 1.24, 1.24, 1.24};
 //    private static final double[] deccelTorqueFrac = new double[]{-2.0, -2.0, -2.0, -2.0};
 
-    public TractionControl(HardwareMap hardwareMap, Telemetry telemetry, VoltageSensor vs) {
+    public MintDrive(HardwareMap hardwareMap, Telemetry telemetry, VoltageSensor vs) {
         this.telemetry = telemetry;
         DcMotor leftFront = hardwareMap.get(DcMotor.class, "front_left_motor");
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "front_right_motor");
@@ -42,16 +44,16 @@ public class TractionControl {
 
         DcMotor[] motors = new DcMotor[]{leftFront, leftBack, rightFront, rightBack};
 
-        mCon = new MotorControl2[4];
+        mCon = new MintMotor[4];
         for (int i = 0; i < 4; i++) {
             if (i < 2) motors[i].setDirection(FORWARD);
             else motors[i].setDirection(REVERSE);
 
-            mCon[i] = new MotorControl2(motors[i], MotorConfig.driveMotor, vs, accelTorqueFrac[i] / 12, cruiseTorqueFrac[i] / 12, deccelTorqueFrac[i] / 12);
+            mCon[i] = new MintMotor(motors[i], MotorConfig.driveMotor, vs, accelTorqueFrac[i] / 12, cruiseTorqueFrac[i] / 12, deccelTorqueFrac[i] / 12);
         }
     }
 
-    public MotorControl2 get(int i) {
+    public MintMotor get(int i) {
         return mCon[i];
     }
 

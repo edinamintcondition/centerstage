@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package parts;
 
 import android.annotation.SuppressLint;
 
@@ -7,8 +7,11 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.teamcode.MotorConfig;
+import org.firstinspires.ftc.teamcode.Speedometer;
+
 @SuppressLint("DefaultLocale")
-public class MotorControl2 {
+public class MintMotor {
     private final DcMotor motor;
     private final VoltageSensor vs;
     private final MotorConfig motorConf;
@@ -18,11 +21,11 @@ public class MotorControl2 {
     private static final double speedTol = 30;
     private static final double coastToStopTol = 90;
 
-    public MotorControl2(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf) {
+    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf) {
         this(motor, motorConf, vs, accelTf, coastTf, accelTf - coastTf);
     }
 
-    public MotorControl2(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf, double deccelTf) {
+    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf, double deccelTf) {
         this.motor = motor;
         this.vs = vs;
         this.motorConf = motorConf;

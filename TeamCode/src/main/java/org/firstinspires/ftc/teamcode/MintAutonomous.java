@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
 
 import com.qualcomm.hardware.bosch.BNO055IMUNew;
@@ -20,6 +19,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 import parts.MintGrabber;
 import parts.MintWrist;
+import parts.MintDrive;
 
 public abstract class MintAutonomous extends LinearOpMode {
 
@@ -48,7 +48,7 @@ public abstract class MintAutonomous extends LinearOpMode {
         currentPos = initPos;
     }
 
-    TractionControl tc;
+    MintDrive tc;
 
     @Override
     public void runOpMode() {
@@ -61,7 +61,7 @@ public abstract class MintAutonomous extends LinearOpMode {
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         myServoL = hardwareMap.get(Servo.class, "grab_servo_L");
         myServoR = hardwareMap.get(Servo.class, "grab_servo_R");
-        tc = new TractionControl(hardwareMap, telemetry, getVs());
+        tc = new MintDrive(hardwareMap, telemetry, getVs());
         //MintGrabber.init(grabServo);
 
         posn = new Positioning(IMU, telemetry);
