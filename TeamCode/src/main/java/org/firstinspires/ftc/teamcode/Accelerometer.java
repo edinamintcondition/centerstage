@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import data.BilinearFunc;
+import data.BilinearFuncFitter;
+
 public class Accelerometer {
     private final BilinearFuncFitter fitter;
 

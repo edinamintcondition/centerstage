@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import parts.MintDrive;
+import parts.MotorConfig;
 
 @Disabled
 @Autonomous

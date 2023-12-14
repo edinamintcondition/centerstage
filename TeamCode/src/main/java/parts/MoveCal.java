@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package parts;
 
 public class MoveCal {
     public final double dpi, accel, deccel, maxSpeed;

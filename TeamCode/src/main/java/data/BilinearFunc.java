@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package data;
 
 public class BilinearFunc {
     public BilinearFunc(double beta0, double beta1, double alpha) {

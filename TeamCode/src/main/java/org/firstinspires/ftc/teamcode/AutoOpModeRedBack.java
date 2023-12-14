@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import data.Point;
+import data.Position;
+
 @Autonomous
 public class AutoOpModeRedBack extends MintAutonomous {
     public AutoOpModeRedBack() {

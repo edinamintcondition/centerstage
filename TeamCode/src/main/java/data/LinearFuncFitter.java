@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package data;
 
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class LinearFuncFitter {
     private final int numSamples;

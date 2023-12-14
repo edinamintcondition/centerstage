@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 
+import data.Point;
+import data.Position;
 import parts.MintGrabber;
 import parts.MintWrist;
 import parts.MintDrive;

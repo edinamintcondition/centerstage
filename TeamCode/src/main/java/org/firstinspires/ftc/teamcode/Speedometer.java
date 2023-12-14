@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import data.LinearFunc;
+import data.LinearFuncFitter;
+
 public class Speedometer {
     private final LinearFuncFitter fitter;
 

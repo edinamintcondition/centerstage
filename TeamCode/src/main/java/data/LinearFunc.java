@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package data;
 
 public class LinearFunc {
     public LinearFunc(double beta, double alpha, double r2) {

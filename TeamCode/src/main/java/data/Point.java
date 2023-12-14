@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package data;
 
 public final class Point {
     public final double x, y;

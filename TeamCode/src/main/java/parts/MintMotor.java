@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.teamcode.MotorConfig;
 import org.firstinspires.ftc.teamcode.Speedometer;
 
 @SuppressLint("DefaultLocale")

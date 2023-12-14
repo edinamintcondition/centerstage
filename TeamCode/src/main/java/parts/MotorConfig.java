@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package parts;
 
 public class MotorConfig {
     public final double topSpeed; //degs per sec
