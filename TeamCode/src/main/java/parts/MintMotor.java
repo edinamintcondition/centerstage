@@ -20,6 +20,7 @@ public class MintMotor {
     private double targetSpeed, torqueFrac, initPos;
     private static final double speedTol = 30;
     private static final double coastToStopTol = 90;
+    private static final double torqueRampTime = 0.1;
 
     public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf) {
         this.motor = motor;
@@ -60,7 +61,6 @@ public class MintMotor {
     }
 
     public void run(double speed) {
-        // if stopping, moving (combine last two)
         if (targetSpeed == 0) {
             if (Math.abs(speed) < coastToStopTol) {
                 torqueFrac = 0;
@@ -68,6 +68,8 @@ public class MintMotor {
                 return;
             }
         }
+
+
 
         if (Math.abs(speed - targetSpeed) < speedTol) torqueFrac = cruiseTorqueFrac;
         else if (speed < targetSpeed) torqueFrac = accelTorqueFrac;
