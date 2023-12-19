@@ -128,38 +128,14 @@ public class MintDrive {
     }
 
     public boolean runForwardTo(double targetPos, boolean strafe) {
-        MoveCal mc;
-        if (strafe) mc = strafeCal;
-        else mc = driveCal;
-
-        double s = getSpeed(strafe);
-        double d = getDeg(strafe);
-        double tgtDeg = mc.dpi * targetPos;
-
-        if (d >= tgtDeg) {
-            setTargetSpeed(0, strafe);
-            return true;
-        }
-
-        double tgtSpeed;
-        double cutoff = tgtDeg + 0.5 * s * s / mc.deccel;
-        if (d >= cutoff) tgtSpeed = 0;
-        else tgtSpeed = mc.maxSpeed;
-
-        for (int i = 0; i < 4; i++)
-            telemetry.addData("motor" + i, get(i));
-        telemetry.addData("pos", d / mc.dpi);
-        telemetry.addData("tgtSpeed", tgtSpeed);
-        telemetry.update();
-
-        setTargetSpeed(tgtSpeed, strafe);
-
-        run(strafe);
-
-        return false;
+        return runTo(targetPos, strafe, 1);
     }
 
-    public boolean runBackTo(double targetPos, boolean strafe) { // combine with runFwdTo
+    public boolean runBackTo(double targetPos, boolean strafe) {
+        return runTo(targetPos, strafe, -1);
+    }
+
+    private boolean runTo(double targetPos, boolean strafe, int dir) {
         MoveCal mc;
         if (strafe) mc = strafeCal;
         else mc = driveCal;
@@ -168,15 +144,15 @@ public class MintDrive {
         double d = getDeg(strafe);
         double tgtDeg = mc.dpi * targetPos;
 
-        if (d <= tgtDeg) {
+        if (d * dir <= tgtDeg * dir) {
             setTargetSpeed(0, strafe);
             return true;
         }
 
         double tgtSpeed;
-        double cutoff = tgtDeg - 0.5 * s * s / mc.deccel;
-        if (d <= cutoff) tgtSpeed = 0;
-        else tgtSpeed = -mc.maxSpeed;
+        double cutoff = tgtDeg + 0.5 * dir * s * s / mc.deccel;
+        if (d * dir >= cutoff * dir) tgtSpeed = 0;
+        else tgtSpeed = dir * mc.maxSpeed;
 
         for (int i = 0; i < 4; i++)
             telemetry.addData("motor" + i, get(i));
