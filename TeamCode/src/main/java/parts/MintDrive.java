@@ -32,7 +32,7 @@ public class MintDrive {
 //    private static final double[] cruiseTorqueFrac = new double[]{1.24, 1.24, 1.24, 1.24};
 //    private static final double[] deccelTorqueFrac = new double[]{-2.0, -2.0, -2.0, -2.0};
 
-    public MintDrive(HardwareMap hardwareMap, Telemetry telemetry, VoltageSensor vs) {
+    public MintDrive(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         DcMotor leftFront = hardwareMap.get(DcMotor.class, "front_left_motor");
         DcMotor rightFront = hardwareMap.get(DcMotor.class, "front_right_motor");
@@ -40,6 +40,8 @@ public class MintDrive {
         DcMotor rightBack = hardwareMap.get(DcMotor.class, "back_right_motor");
 
         DcMotor[] motors = new DcMotor[]{leftFront, leftBack, rightFront, rightBack};
+
+        VoltageSensor vs = getVs(hardwareMap);
 
         mCon = new MintMotor[4];
         for (int i = 0; i < 4; i++) {
@@ -160,5 +162,13 @@ public class MintDrive {
         run(strafe);
 
         return false;
+    }
+
+    private static VoltageSensor getVs(HardwareMap hardwareMap) {
+        for (VoltageSensor vs : hardwareMap.voltageSensor) {
+            return vs;
+        }
+
+        throw new RuntimeException("no voltage sensor");
     }
 }

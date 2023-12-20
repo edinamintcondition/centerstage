@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -63,7 +62,7 @@ public abstract class MintAutonomous extends LinearOpMode {
         wristServo = hardwareMap.get(Servo.class, "wrist_servo");
         myServoL = hardwareMap.get(Servo.class, "grab_servo_L");
         myServoR = hardwareMap.get(Servo.class, "grab_servo_R");
-        tc = new MintDrive(hardwareMap, telemetry, getVs());
+        tc = new MintDrive(hardwareMap, telemetry);
         //MintGrabber.init(grabServo);
 
         posn = new Positioning(IMU, telemetry);
@@ -327,13 +326,5 @@ public abstract class MintAutonomous extends LinearOpMode {
             }
         }
         return true;
-    }
-
-    private VoltageSensor getVs() {
-        for (VoltageSensor vs : hardwareMap.voltageSensor) {
-            return vs;
-        }
-
-        throw new RuntimeException("no voltage sensor");
     }
 }

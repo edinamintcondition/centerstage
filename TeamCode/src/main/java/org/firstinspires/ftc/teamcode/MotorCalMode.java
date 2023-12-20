@@ -25,7 +25,7 @@ public class MotorCalMode extends LinearOpMode {
     public void runOpMode() {
         getVs();
 
-        MintDrive tc = new MintDrive(hardwareMap,telemetry, vs);
+        MintDrive tc = new MintDrive(hardwareMap,telemetry);
         waitForStart();
 
         telemetry.addData("test", "motor starting voltage");
