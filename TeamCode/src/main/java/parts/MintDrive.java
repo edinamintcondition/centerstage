@@ -53,7 +53,7 @@ public class MintDrive {
             double accelTf = accelVolts[i] / MotorConfig.driveMotor.nominalVolt;
             double coastTf = cruiseVolts[i] / MotorConfig.driveMotor.nominalVolt;
             double torqueRamp = accelTf / torqueRampTime;
-            
+
             mCon[i] = new MintMotor(motors[i], MotorConfig.driveMotor, vs, accelTf, coastTf, torqueRamp);
         }
     }
@@ -147,7 +147,7 @@ public class MintDrive {
         double d = getDeg(strafe);
         double tgtDeg = mc.dpi * targetPos;
 
-        if (d * dir <= tgtDeg * dir) {
+        if (d * dir >= tgtDeg * dir) {
             setTargetSpeed(0, strafe);
             return true;
         }

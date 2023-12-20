@@ -93,7 +93,6 @@ public abstract class MintAutonomous extends LinearOpMode {
         waitForStart();
 
         posn.resetPosition();
-        //grabServo.setPosition(MintGrabber.CLOSED_POSITION);
 
         myServoL.setPosition(MintGrabber.CLOSED_POSITION_L);
         myServoL.setPosition(MintGrabber.OPEN_POSITION_R);
