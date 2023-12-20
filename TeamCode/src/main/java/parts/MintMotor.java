@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Speedometer;
 
@@ -17,18 +18,21 @@ public class MintMotor {
     private final double accelTorqueFrac;
     private final double cruiseTorqueFrac;
     private final Speedometer speedo;
-    private double targetSpeed, torqueFrac, initPos;
+    private double targetSpeed, torqueFrac, initPos, prevTime;
     private static final double speedTol = 30;
     private static final double coastToStopTol = 90;
-    private static final double torqueRampTime = 0.1;
+    private final double torqueRamp;
+    private final ElapsedTime t;
 
-    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf) {
+    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf, double torqueRamp) {
         this.motor = motor;
         this.vs = vs;
         this.motorConf = motorConf;
         this.accelTorqueFrac = accelTf;
         this.cruiseTorqueFrac = coastTf;
+        this.torqueRamp = torqueRamp;
         speedo = new Speedometer(8);
+        t = new ElapsedTime();
     }
 
     public DcMotor getMotor() {
@@ -69,11 +73,21 @@ public class MintMotor {
             }
         }
 
-
+        double prevTorqueFrac = torqueFrac;
 
         if (Math.abs(speed - targetSpeed) < speedTol) torqueFrac = cruiseTorqueFrac;
         else if (speed < targetSpeed) torqueFrac = accelTorqueFrac;
         else torqueFrac = -accelTorqueFrac;
+
+        double currTime = t.seconds();
+        double deltaTime = currTime - prevTime;
+        prevTime = currTime;
+
+        double minTf = prevTorqueFrac - torqueRamp * deltaTime;
+        double maxTf = prevTorqueFrac + torqueRamp * deltaTime;
+
+        if (torqueFrac < minTf) torqueFrac = minTf;
+        if (torqueFrac > maxTf) torqueFrac = maxTf;
 
         double volt = (torqueFrac + speed / motorConf.topSpeed) * motorConf.nominalVolt;
         motor.setPower(volt / vs.getVoltage());

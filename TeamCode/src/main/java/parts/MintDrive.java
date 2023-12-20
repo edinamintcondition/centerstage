@@ -21,8 +21,10 @@ public class MintDrive {
     //for 20:1
     private static final MoveCal driveCal = new MoveCal(15, 540, -585, 300);
     private static final MoveCal strafeCal = new MoveCal(15, 571, -1200, 300);
-    private static final double[] accelTorqueFrac = new double[]{0.9619 * 3.0, 0.9748 * 3.0, 1.0273 * 3.0, 1.0405 * 3.0};
-    private static final double[] cruiseTorqueFrac = new double[]{1.24, 1.24, 1.24, 1.24};
+    private static final double[] accelVolts = new double[]{0.9619 * 3.0, 0.9748 * 3.0, 1.0273 * 3.0, 1.0405 * 3.0};
+    private static final double[] cruiseVolts = new double[]{1.24, 1.24, 1.24, 1.24};
+    private static final double maxSpeed = 300;
+    private static final double torqueRampTime = 0.1;
     private Telemetry telemetry;
 
     //for 40:1
@@ -48,7 +50,11 @@ public class MintDrive {
             if (i < 2) motors[i].setDirection(FORWARD);
             else motors[i].setDirection(REVERSE);
 
-            mCon[i] = new MintMotor(motors[i], MotorConfig.driveMotor, vs, accelTorqueFrac[i] / 12, cruiseTorqueFrac[i] / 12);
+            double accelTf = accelVolts[i] / MotorConfig.driveMotor.nominalVolt;
+            double coastTf = cruiseVolts[i] / MotorConfig.driveMotor.nominalVolt;
+            double torqueRamp = accelTf / torqueRampTime;
+            
+            mCon[i] = new MintMotor(motors[i], MotorConfig.driveMotor, vs, accelTf, coastTf, torqueRamp);
         }
     }
 
