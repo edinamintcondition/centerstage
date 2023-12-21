@@ -18,7 +18,9 @@ public class MintMotor {
     private final double accelTorqueFrac;
     private final double cruiseTorqueFrac;
     private final Speedometer speedo;
-    private double targetSpeed, torqueFrac, initPos, prevTime;
+    private double targetSpeed, initPos;
+    private double torqueFrac, prevTorqueFrac;
+    private double currTime, prevTime;
     private static final double speedTol = 30;
     private static final double coastToStopTol = 90;
     private final double torqueRamp;
@@ -62,6 +64,9 @@ public class MintMotor {
 
     public void sample() {
         speedo.sample(getDeg());
+        prevTorqueFrac = torqueFrac;
+        prevTime = currTime;
+        currTime = t.seconds();
     }
 
     public void run(double speed) {
@@ -73,16 +78,11 @@ public class MintMotor {
             }
         }
 
-        double prevTorqueFrac = torqueFrac;
-
         if (Math.abs(speed - targetSpeed) < speedTol) torqueFrac = cruiseTorqueFrac;
         else if (speed < targetSpeed) torqueFrac = accelTorqueFrac;
         else torqueFrac = -accelTorqueFrac;
 
-        double currTime = t.seconds();
         double deltaTime = currTime - prevTime;
-        prevTime = currTime;
-
         double minTf = prevTorqueFrac - torqueRamp * deltaTime;
         double maxTf = prevTorqueFrac + torqueRamp * deltaTime;
 
