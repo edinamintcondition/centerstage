@@ -78,7 +78,9 @@ public class MintMotor {
             }
         }
 
-        if (Math.abs(speed - targetSpeed) < speedTol) torqueFrac = cruiseTorqueFrac;
+        int dir = targetSpeed < 0 ? -1 : 1;
+
+        if (Math.abs(speed - targetSpeed) < speedTol) torqueFrac = dir * cruiseTorqueFrac;
         else if (speed < targetSpeed) torqueFrac = accelTorqueFrac;
         else torqueFrac = -accelTorqueFrac;
 
