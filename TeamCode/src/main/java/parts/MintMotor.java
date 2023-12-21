@@ -21,7 +21,8 @@ public class MintMotor {
     private double targetSpeed, initPos;
     private double torqueFrac, prevTorqueFrac;
     private double currTime, prevTime;
-    private static final double speedTol = 30;
+    private static final double speedTol = 3;
+    private static final double stopTol = 30;
     private static final double coastToStopTol = 90;
     private final double torqueRamp;
     private final ElapsedTime t;
@@ -50,7 +51,7 @@ public class MintMotor {
     }
 
     public boolean isStopped() {
-        return Math.abs(getSpeed()) < speedTol;
+        return Math.abs(getSpeed()) < stopTol;
     }
 
     public void setTargetSpeed(double t) {
