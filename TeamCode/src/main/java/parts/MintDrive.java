@@ -14,8 +14,6 @@ import java.util.Arrays;
 public class MintDrive {
     private final MintMotor[] mCon;
 
-    // organize calibrations
-    // don't need separate accel, deccel torque
     // use calibration multipliers in different array
 
     //for 20:1
@@ -60,17 +58,6 @@ public class MintDrive {
 
     public MintMotor get(int i) {
         return mCon[i];
-    }
-
-    public DcMotor[] getMotors() {
-        DcMotor[] motors = new DcMotor[4];
-        for (int i = 0; i < 4; i++)
-            motors[i] = get(i).getMotor();
-        return motors;
-    }
-
-    public double getDriveSpeed() {
-        return getSpeed(false);
     }
 
     public double getSpeed(boolean strafe) {

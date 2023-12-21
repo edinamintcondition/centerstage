@@ -26,12 +26,12 @@ public class MintMotor {
     private final double torqueRamp;
     private final ElapsedTime t;
 
-    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double coastTf, double torqueRamp) {
+    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double cruiseTf, double torqueRamp) {
         this.motor = motor;
         this.vs = vs;
         this.motorConf = motorConf;
         this.accelTorqueFrac = accelTf;
-        this.cruiseTorqueFrac = coastTf;
+        this.cruiseTorqueFrac = cruiseTf;
         this.torqueRamp = torqueRamp;
         speedo = new Speedometer(8);
         t = new ElapsedTime();
