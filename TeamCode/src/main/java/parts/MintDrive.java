@@ -22,7 +22,7 @@ public class MintDrive {
     private static final double[] accelVolts = new double[]{0.9619 * 0.25, 0.9748 * 0.25, 1.0273 * 0.25, 1.0405 * 0.25};
     private static final double[] cruiseVolts = new double[]{0.9619 * 0.18, 0.9748 * 0.18, 1.0273 * 0.18, 1.0405 * 0.18};
     private static final double maxSpeed = 300;
-    private static final double torqueRampTime = 0.1;
+    private static final double torqueRampTime = 0.2;
     private Telemetry telemetry;
 
     //for 40:1

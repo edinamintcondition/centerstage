@@ -5,7 +5,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODE
 import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -14,7 +13,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import parts.MintDrive;
 import parts.MotorConfig;
 
-@Disabled
 @Autonomous
 @SuppressLint("DefaultLocale")
 public class MotorCalMode extends LinearOpMode {

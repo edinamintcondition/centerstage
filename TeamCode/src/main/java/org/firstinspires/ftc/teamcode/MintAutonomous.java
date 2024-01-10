@@ -130,7 +130,7 @@ public abstract class MintAutonomous extends LinearOpMode {
     public abstract void park();
 
     public void liftArm() {
-        wristServo.setPosition(MintWrist.DROP_POSITION+0.7);
+        wristServo.setPosition(MintWrist.DROP_POSITION);
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -202,7 +202,7 @@ public abstract class MintAutonomous extends LinearOpMode {
         telemetry.addData("pos", "%f %f", currentPos.x, currentPos.y);
         telemetry.update();
 
-        sleep(500);
+        sleep(250);
     }
 
     public void driveToClosestPoint(Point target) {
