@@ -1,28 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-
 import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import parts.MintDrive;
-import parts.MotorConfig;
 
 @Autonomous
 @SuppressLint("DefaultLocale")
 public class MotorCalMode extends LinearOpMode {
-    private VoltageSensor vs;
-    private final MotorConfig mConf = MotorConfig.driveMotor;
-
     @Override
     public void runOpMode() {
-        getVs();
-
         MintDrive tc = new MintDrive(hardwareMap,telemetry);
         waitForStart();
 
@@ -37,7 +26,7 @@ public class MotorCalMode extends LinearOpMode {
 
         double[] avgAccel = new double[4];
         int nTest = 3;
-        boolean strafe = true;
+        boolean strafe = false;
         double tgtSpeed = 300;
         for (int test = 0; test < nTest; test++) {
             double[] accel = testAccel(tc, tgtSpeed, strafe);
@@ -79,42 +68,6 @@ public class MotorCalMode extends LinearOpMode {
         while (opModeIsActive()) {
             sleep(1);
         }
-    }
-
-    private double testStartVolts(DcMotor[] m) {
-        double[] initPos = new double[4];
-        for (int i = 0; i < 4; i++) {
-            m[i].setMode(RUN_WITHOUT_ENCODER);
-            initPos[i] = m[i].getCurrentPosition();
-        }
-
-        double volt = 0;
-        ElapsedTime t = new ElapsedTime();
-        while (opModeIsActive()) {
-            int moved = 0;
-            for (int i = 0; i < 4; i++) {
-                if (Math.abs(m[i].getCurrentPosition() - initPos[i]) > 4)
-                    moved++;
-            }
-
-            if (moved == 4)
-                break;
-
-            volt = t.seconds() / 5;
-            if (volt > 12) throw new RuntimeException("motor did not start");
-
-            telemetry.addData("volt", "%.02f", volt);
-            telemetry.update();
-
-            for (int i = 0; i < 4; i++)
-                m[i].setPower(volt / vs.getVoltage());
-        }
-
-        for (int i = 0; i < 4; i++)
-            m[i].setPower(0);
-        sleep(50);
-
-        return volt;
     }
 
     private double[] testAccel(MintDrive tc, double tgtSpeed, boolean strafe) {
@@ -199,25 +152,6 @@ public class MotorCalMode extends LinearOpMode {
             if (tc.isStopped())
                 break;
         }
-    }
-
-    private void dump(DcMotor[] motors, double startVolts, double[] accel) {
-        telemetry.addData("v start", "%.2f", startVolts);
-        for (int i = 0; i < 4; i++) {
-            double pos = mConf.toPos(motors[i].getCurrentPosition());
-            String s = String.format("p=%.2f, a=%.2f", pos, accel[i]);
-            telemetry.addData("motor" + i, s);
-        }
-        telemetry.update();
-    }
-
-    private void getVs() {
-        for (VoltageSensor vs : hardwareMap.voltageSensor) {
-            this.vs = vs;
-            return;
-        }
-
-        throw new RuntimeException("no voltage sensor");
     }
 
     private double avg(double[] x) {

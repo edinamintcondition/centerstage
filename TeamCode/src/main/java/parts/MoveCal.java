@@ -11,4 +11,3 @@ public class MoveCal {
         this.maxSpeed = maxSpeed;
     }
 }
-
