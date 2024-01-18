@@ -14,11 +14,16 @@ public class DriveTestMode extends LinearOpMode {
     also get stats on torquefrac used in cruise mode
     Use LinearFuncFitter to find DRAG_MULT for cruise
     do something similar for deceleration*/
+
+    MintDrive md;
+
     @Override
     public void runOpMode() {
-        MintDrive md = new MintDrive(hardwareMap, telemetry);
+        md = new MintDrive(hardwareMap, telemetry);
         waitForStart();
+    }
 
+    private void test(double targetPos, boolean strafe) {
         md.setDriveDist(60, false);
 
         while (opModeIsActive()) {

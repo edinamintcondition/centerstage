@@ -132,27 +132,31 @@ public class MintDrive {
     private double targetDegs;
     private double targetDir;
     private ElapsedTime driveTime;
-    private MoveCal aMC;
+    private DynamicParams aDP;
     private double degStopAccel, degStopDeccel;
+    //    private static final MoveCal driveCal = new MoveCal(15, 900, -930, 300);
+    private final DynamicParams driveParams = new DynamicParams(900, 300, -990,
+            0.000235201657558, 0.0001, 0.000041653270461);
+    private final DynamicParams strafeParams = null;
 
     public void setDriveDist(double targetPos, boolean strafe) {
         resetDeg();
         driveTime = new ElapsedTime();
 
-        if (strafe) aMC = strafeCal;
-        else aMC = driveCal;
+        if (strafe) aDP = driveParams;
+        else aDP = strafeParams;
 
-        this.targetDegs = Math.abs(aMC.dpi * targetPos);
+        this.targetDegs = Math.abs(aDP.getDpi() * targetPos);
         targetDir = Math.signum(targetPos);
 
-        double vMax = aMC.maxSpeed;
-        degStopAccel = vMax * vMax / (2 * aMC.accel);
-        degStopDeccel = vMax * vMax / (2 * -aMC.deccel);
+        double vMax = aDP.getMaxSpeed();
+        degStopAccel = vMax * vMax / (2 * aDP.getTargetAccel());
+        degStopDeccel = vMax * vMax / (2 * -aDP.getTargetDeccel());
 
-        tAccel = Math.sqrt(2 * degStopAccel / aMC.accel);
+        tAccel = Math.sqrt(2 * degStopAccel / aDP.getTargetAccel());
         tCruise = tAccel + (targetDegs - degStopDeccel - degStopAccel) / vMax;
 
-        tDeccel = tCruise + Math.sqrt(2 * degStopDeccel / -aMC.deccel);
+        tDeccel = tCruise + Math.sqrt(2 * degStopDeccel / -aDP.getTargetDeccel());
     }
 
     public boolean runDrive(boolean strafe) {
@@ -162,16 +166,16 @@ public class MintDrive {
 
         if (t < tAccel) {
             telemetry.addData("mode", "accel");
-            a = aMC.accel;
+            a = aDP.getTargetAccel();
             d = a / 2 * t * t;
         } else if (t < tCruise) {
             telemetry.addData("mode", "cruise");
             a = 0;
-            d = degStopAccel + aMC.maxSpeed * (t - tAccel);
+            d = degStopAccel + aDP.getAccelMult() * (t - tAccel);
         } else if (t < tDeccel) {
             telemetry.addData("mode", "deccel");
             double s = t - tDeccel;
-            a = aMC.deccel;
+            a = aDP.getTargetDeccel();
             d = targetDegs + a / 2 * s * s;
         } else {
             telemetry.addData("mode", "stopped");

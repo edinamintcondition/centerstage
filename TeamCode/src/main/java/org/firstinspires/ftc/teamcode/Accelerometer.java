@@ -21,10 +21,6 @@ public class Accelerometer {
         return accel;
     }
 
-    public int getNumSamples() {
-        return fitter.getNumSamples();
-    }
-
     public void sample(double degrees) {
         double t = elapsedTime.seconds();
         fitter.sample(t * t, t, degrees);
