@@ -139,6 +139,10 @@ public class MintDrive {
             0.000235201657558, 0.0001, 0.000041653270461);
     private final DynamicParams strafeParams = null;
 
+    public DynamicParams getActiveDynamicParams() {
+        return aDP;
+    }
+
     public void setDriveDist(double targetPos, boolean strafe) {
         resetDeg();
         driveTime = new ElapsedTime();
@@ -164,15 +168,20 @@ public class MintDrive {
         double a;   //desired accel
         double d;   //desired degree
 
+        double currDeg = getDeg(strafe);
+
         if (t < tAccel) {
+            aDP.sampleAccel(currDeg);
             telemetry.addData("mode", "accel");
             a = aDP.getTargetAccel();
             d = a / 2 * t * t;
         } else if (t < tCruise) {
+            aDP.sampleCruise(currDeg);
             telemetry.addData("mode", "cruise");
             a = 0;
             d = degStopAccel + aDP.getAccelMult() * (t - tAccel);
         } else if (t < tDeccel) {
+            aDP.sampleDeccel(currDeg);
             telemetry.addData("mode", "deccel");
             double s = t - tDeccel;
             a = aDP.getTargetDeccel();

@@ -7,28 +7,30 @@ import parts.MintDrive;
 
 @Autonomous
 public class DriveTestMode extends LinearOpMode {
-    /*Set ERR_MULT and DRAG_MULT = 0, and calibrate.
-    Grab pos at end of acceleration, and compare to degreeStopAccel
-    ratio used to change ACCEL_MULT
-    once start cruising, start accelerometer (if you hit 0 then stop)
-    also get stats on torquefrac used in cruise mode
-    Use LinearFuncFitter to find DRAG_MULT for cruise
-    do something similar for deceleration*/
-
-    MintDrive md;
+    private MintDrive md;
 
     @Override
     public void runOpMode() {
         md = new MintDrive(hardwareMap, telemetry);
         waitForStart();
+
+        int dir = 1;
+        for (int trial = 0; trial < 6; trial++) {
+            test(60 * dir, false);
+            dir = -dir;
+        }
     }
 
     private void test(double targetPos, boolean strafe) {
-        md.setDriveDist(60, false);
+        md.setDriveDist(targetPos, strafe);
 
         while (opModeIsActive()) {
             boolean done = md.runDrive(false);
             if (done) break;
         }
+
+        telemetry.addData("DP", md.getActiveDynamicParams());
+        telemetry.update();
+        sleep(5000);
     }
 }
