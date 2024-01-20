@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import parts.DynamicParams;
 import parts.MintDrive;
 
 @Autonomous
@@ -24,12 +25,24 @@ public class DriveTestMode extends LinearOpMode {
     private void test(double targetPos, boolean strafe) {
         md.setDriveDist(targetPos, strafe);
 
+        DynamicParams adp = md.getActiveDynamicParams();
+        adp.startCalibration();
+
+        telemetry.addData("DP", adp);
+        telemetry.addData("pos", "target=%.1f", targetPos);
+        telemetry.update();
+
         while (opModeIsActive()) {
             boolean done = md.runDrive(false);
             if (done) break;
         }
 
-        telemetry.addData("DP", md.getActiveDynamicParams());
+        double actualPos = md.getDeg(strafe);
+
+        adp.finishCalibration();
+
+        telemetry.addData("DP", adp);
+        telemetry.addData("pos", "target=%.1f, actual=%.1f", targetPos, actualPos);
         telemetry.update();
         sleep(5000);
     }

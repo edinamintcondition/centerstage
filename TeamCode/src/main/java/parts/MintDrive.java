@@ -103,6 +103,11 @@ public class MintDrive {
         return (d[1] + d[2]) / 2;
     }
 
+    public double getPos(boolean strafe) {
+        double deg = getDeg(strafe);
+        return deg / aDP.getDpi();
+    }
+
     public void run(boolean strafe) {
         for (int i = 0; i < 4; i++)
             get(i).sample();
@@ -137,7 +142,8 @@ public class MintDrive {
     //    private static final MoveCal driveCal = new MoveCal(15, 900, -930, 300);
     private final DynamicParams driveParams = new DynamicParams(900, 300, -990,
             0.000235201657558, 0.0001, 0.000041653270461);
-    private final DynamicParams strafeParams = null;
+    private final DynamicParams strafeParams = new DynamicParams(900, 300, -990,
+            0.000235201657558, 0.0001, 0.000041653270461);
 
     public DynamicParams getActiveDynamicParams() {
         return aDP;
@@ -205,10 +211,10 @@ public class MintDrive {
         double v = getSpeed(strafe);
         double s = strafe ? -1 : 1;
 
-        get(0).run(v, a, d, 1);
-        get(1).run(v, a, d, s);
-        get(2).run(v, a, d, s);
-        get(3).run(v, a, d, 1);
+        get(0).run(v, a, d, 1, aDP);
+        get(1).run(v, a, d, s, aDP);
+        get(2).run(v, a, d, s, aDP);
+        get(3).run(v, a, d, 1, aDP);
 
         return t > tDeccel + 0.05;
     }

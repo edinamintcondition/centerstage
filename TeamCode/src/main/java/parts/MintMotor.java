@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Speedometer;
 
 @SuppressLint("DefaultLocale")
 public class MintMotor {
+    private static final double NOMINAL_VOLTS = 12;
     private final DcMotor motor;
     private final VoltageSensor vs;
     private final MotorConfig motorConf;
@@ -74,20 +75,20 @@ public class MintMotor {
         currTime = t.seconds();
     }
 
-    private static final double ACCEL_MULT = 0.000235201657558, ERR_MULT = 0.0001, DRAG_MULT = 0.000041653270461;
-
-    public void run(double speed, double accelTgt, double degTgt, double dir) {
-        double x = accelTgt == 0 ? 1 : 0;
+    public void run(double speed, double accelTgt, double degTgt, double dir, DynamicParams p) {
+        double coast = accelTgt == 0 ? 1 : 0;
 
         speed *= dir;
         accelTgt *= dir;
         degTgt *= dir;
-        x *= dir;
+        coast *= dir;
 
         double degErr = degTgt - getDeg();
 
-        double torqueFrac = ACCEL_MULT * accelTgt + ERR_MULT * degErr + x * DRAG_MULT;
-        double volt = (torqueFrac + speed / motorConf.topSpeed) * motorConf.nominalVolt;
+        double torqueFrac = p.getAccelMult() * accelTgt
+                + p.getErrMult() * degErr
+                + p.getCoastMult() * coast;
+        double volt = (torqueFrac + speed / p.getMaxSpeed()) * NOMINAL_VOLTS;
         motor.setPower(volt / vs.getVoltage());
     }
 

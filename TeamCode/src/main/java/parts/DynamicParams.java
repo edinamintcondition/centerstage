@@ -3,30 +3,26 @@ package parts;
 import org.firstinspires.ftc.teamcode.Accelerometer;
 
 public class DynamicParams {
-    private final double targetAccel, maxSpeed;
-    private double targetDeccel;
-    private double accelMult, errMult, dragMult;
-    private Accelerometer aMeter, cMeter, dMeter;
-    private Calibrator accelMultCal, errMultCal;
+    private final double targetAccel, maxSpeed, errMult;
+    private double accelMult, coastMult, targetDeccel;
+    private final Accelerometer aMeter, cMeter, dMeter;
+    private final Calibrator accelMultCal, coastMultCal;
 
     public DynamicParams(double targetAccel, double maxSpeed, double targetDeccel,
-                         double accelMult, double errMult, double dragMult) {
-//        accelMult = 0.000235201657558;
-//        errMult = 0.0001;
-//        dragMult = 0.000041653270461;
+                         double accelMult, double errMult, double coastMult) {
         this.targetAccel = targetAccel;
         this.maxSpeed = maxSpeed;
         this.targetDeccel = targetDeccel;
         this.accelMult = accelMult;
         this.errMult = errMult;
-        this.dragMult = dragMult;
+        this.coastMult = coastMult;
 
         aMeter = new Accelerometer(1000);
         cMeter = new Accelerometer(1000);
         dMeter = new Accelerometer(1000);
 
         accelMultCal = new Calibrator(targetAccel, accelMult);
-        errMultCal = new Calibrator(0, errMult);
+        coastMultCal = new Calibrator(0, coastMult);
     }
 
     public double getDpi() {
@@ -41,8 +37,8 @@ public class DynamicParams {
         return errMult;
     }
 
-    public double getDragMult() {
-        return dragMult;
+    public double getCoastMult() {
+        return coastMult;
     }
 
     public double getTargetAccel() {
@@ -54,15 +50,26 @@ public class DynamicParams {
     }
 
     public void sampleAccel(double deg) {
+        aMeter.sample(deg);
     }
 
     public void sampleCruise(double deg) {
+        cMeter.sample(deg);
     }
 
     public void sampleDeccel(double deg) {
+        dMeter.sample(deg);
     }
 
-    public void update() {
+    public void startCalibration() {
+        accelMult = accelMultCal.getGuess();
+        coastMult = coastMultCal.getGuess();
+    }
+
+    public void finishCalibration() {
+        accelMultCal.updateGuess(aMeter.getAccel());
+        coastMultCal.updateGuess(cMeter.getAccel());
+        targetDeccel = dMeter.getAccel();
     }
 
     public double getMaxSpeed() {
