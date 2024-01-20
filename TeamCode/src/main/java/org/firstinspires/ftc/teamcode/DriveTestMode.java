@@ -22,28 +22,23 @@ public class DriveTestMode extends LinearOpMode {
         }
     }
 
-    private void test(double targetPos, boolean strafe) {
-        md.setDriveDist(targetPos, strafe);
-
-        DynamicParams adp = md.getActiveDynamicParams();
-        adp.startCalibration();
+    private void test(double targetDist, boolean strafe) {
+        md.preRun(targetDist, strafe);
 
         md.addTelemetry();
-        telemetry.addData("pos", "target=%.1f", targetPos);
+        telemetry.addData("pos", "target=%.1f", targetDist);
         telemetry.update();
         sleep(5000);
 
         while (opModeIsActive()) {
-            boolean done = md.runDrive(false);
+            boolean done = md.run();
             if (done) break;
         }
 
-        double actualPos = md.getDeg(strafe);
-
-        adp.finishCalibration();
+        double actualPos = md.getPos();
 
         md.addTelemetry();
-        telemetry.addData("pos", "target=%.1f, actual=%.1f", targetPos, actualPos);
+        telemetry.addData("pos", "target=%.1f, actual=%.1f", targetDist, actualPos);
         telemetry.update();
         sleep(5000);
     }

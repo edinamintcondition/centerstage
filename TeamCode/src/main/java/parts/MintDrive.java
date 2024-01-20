@@ -258,16 +258,74 @@ public class MintDrive {
     }
 
     private double[] move;
-
-    public boolean runTo(double targetPos, boolean strafe) {
-    }
+    private MoveCal amc;
+    private double dir, tgtDeg;
 
     public double getSpeed() {
+        double[] d = new double[4];
+        for (int i = 0; i < 4; i++)
+            d[i] = get(1).getSpeed() * move[i]; // mult/divide?
 
+        Arrays.sort(d);
+        return (d[1] + d[2]) / 2;
     }
 
-    private boolean runTo(double targetPos, boolean strafe, int dir) {
+    public double getDeg() {
+        double[] d = new double[4];
+        for (int i = 0; i < 4; i++)
+            d[i] = get(1).getDeg() * move[i]; // mult/divide?
 
+        Arrays.sort(d);
+        return (d[1] + d[2]) / 2;
+    }
+
+    public double getPos() {
+        double deg = getDeg();
+        return deg / aDP.getDpi();
+    }
+
+    public void preRun(double targetPos, boolean strafe) {
+        resetDeg();
+
+        if (strafe) {
+            move = new double[]{1, -1, -1, 1};
+            amc = strafeCal;
+        } else {
+            move = new double[]{1, 1, 1, 1};
+            amc = driveCal;
+        }
+
+        tgtDeg = amc.dpi * targetPos;
+        dir = Math.signum(targetPos);
+    }
+
+    public boolean run() {
+        for (int i = 0; i < 4; i++)
+            get(i).sample();
+        double s = getSpeed();
+        double d = getDeg();
+
+        if (d * dir >= tgtDeg * dir) {
+            setTargetSpeed(0);
+            return true;
+        }
+
+        double tgtSpeed;
+        double cutoff = tgtDeg + 0.5 * dir * s * s / amc.deccel;
+        if (d * dir >= cutoff * dir) tgtSpeed = 0;
+        else tgtSpeed = dir * amc.maxSpeed;
+
+        setTargetSpeed(tgtSpeed);
+
+        for (int i = 0; i < 4; i++)
+            get(0).run(s * move[i]);
+
+        return false;
+    }
+
+    private void setTargetSpeed(double t) {
+        for (int i = 0; i < 4; i++)
+            get(i).setTargetSpeed(t * move[i]);
     }
 
     private static VoltageSensor getVs(HardwareMap hardwareMap) {
