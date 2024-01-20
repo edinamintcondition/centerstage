@@ -141,12 +141,19 @@ public class MintDrive {
     private double degStopAccel, degStopDeccel;
     //    private static final MoveCal driveCal = new MoveCal(15, 900, -930, 300);
     private final DynamicParams driveParams = new DynamicParams(900, 300, -990,
-            0.000235201657558, 0.0001, 0.000041653270461);
+            0.235201657558, 0.0001, 0.0041653270461);
     private final DynamicParams strafeParams = new DynamicParams(900, 300, -990,
-            0.000235201657558, 0.0001, 0.000041653270461);
+            0.235201657558, 0.0001, 0.0041653270461);
 
     public DynamicParams getActiveDynamicParams() {
         return aDP;
+    }
+
+    public void addTelemetry() {
+        telemetry.addData("params", aDP);
+        telemetry.addData("tgt", "deg=%.0f, dir=%f, stopAcc=%.0f, stopDec=%.0f",
+                targetDegs, targetDir, degStopAccel, degStopDeccel);
+        telemetry.addData("time", "a=%.2f, c=%.2f, d=%.2f", tAccel, tCruise, tDeccel);
     }
 
     public void setDriveDist(double targetPos, boolean strafe) {
@@ -178,17 +185,17 @@ public class MintDrive {
 
         if (t < tAccel) {
             aDP.sampleAccel(currDeg);
-            telemetry.addData("mode", "accel");
+            telemetry.addData("mode", "accel %.0f < %.0f", t, tAccel);
             a = aDP.getTargetAccel();
             d = a / 2 * t * t;
         } else if (t < tCruise) {
             aDP.sampleCruise(currDeg);
-            telemetry.addData("mode", "cruise");
+            telemetry.addData("mode", "cruise %.0f < %.0f", t, tCruise);
             a = 0;
             d = degStopAccel + aDP.getAccelMult() * (t - tAccel);
         } else if (t < tDeccel) {
             aDP.sampleDeccel(currDeg);
-            telemetry.addData("mode", "deccel");
+            telemetry.addData("mode", "deccel %.0f < %.0f", t, tDeccel);
             double s = t - tDeccel;
             a = aDP.getTargetDeccel();
             d = targetDegs + a / 2 * s * s;
@@ -201,8 +208,7 @@ public class MintDrive {
         a *= targetDir;
         d *= targetDir;
 
-        telemetry.addData("a", a);
-        telemetry.addData("d", d);
+        telemetry.addData("drive", "atg=%.1f, dtg=%.1f", a, d);
         telemetry.update();
 
         for (int i = 0; i < 4; i++)
@@ -249,6 +255,19 @@ public class MintDrive {
         run(strafe);
 
         return false;
+    }
+
+    private double[] move;
+
+    public boolean runTo(double targetPos, boolean strafe) {
+    }
+
+    public double getSpeed() {
+
+    }
+
+    private boolean runTo(double targetPos, boolean strafe, int dir) {
+
     }
 
     private static VoltageSensor getVs(HardwareMap hardwareMap) {

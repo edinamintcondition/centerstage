@@ -87,7 +87,7 @@ public class MintMotor {
 
         double torqueFrac = p.getAccelMult() * accelTgt
                 + p.getErrMult() * degErr
-                + p.getCoastMult() * coast;
+                + p.getCruiseMult() * coast;
         double volt = (torqueFrac + speed / p.getMaxSpeed()) * NOMINAL_VOLTS;
         motor.setPower(volt / vs.getVoltage());
     }

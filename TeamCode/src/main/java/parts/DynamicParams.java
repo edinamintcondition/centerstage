@@ -1,28 +1,31 @@
 package parts;
 
+import android.annotation.SuppressLint;
+
 import org.firstinspires.ftc.teamcode.Accelerometer;
 
+@SuppressLint("DefaultLocale")
 public class DynamicParams {
     private final double targetAccel, maxSpeed, errMult;
-    private double accelMult, coastMult, targetDeccel;
+    private double accelMult, cruiseMult, targetDeccel;
     private final Accelerometer aMeter, cMeter, dMeter;
-    private final Calibrator accelMultCal, coastMultCal;
+    private final Calibrator accelMultCal, cruiseMultCal;
 
     public DynamicParams(double targetAccel, double maxSpeed, double targetDeccel,
-                         double accelMult, double errMult, double coastMult) {
+                         double accelMult, double errMult, double cruiseMult) {
         this.targetAccel = targetAccel;
         this.maxSpeed = maxSpeed;
         this.targetDeccel = targetDeccel;
         this.accelMult = accelMult;
         this.errMult = errMult;
-        this.coastMult = coastMult;
+        this.cruiseMult = cruiseMult;
 
         aMeter = new Accelerometer(1000);
         cMeter = new Accelerometer(1000);
         dMeter = new Accelerometer(1000);
 
         accelMultCal = new Calibrator(targetAccel, accelMult);
-        coastMultCal = new Calibrator(0, coastMult);
+        cruiseMultCal = new Calibrator(0, cruiseMult);
     }
 
     public double getDpi() {
@@ -37,8 +40,8 @@ public class DynamicParams {
         return errMult;
     }
 
-    public double getCoastMult() {
-        return coastMult;
+    public double getCruiseMult() {
+        return cruiseMult;
     }
 
     public double getTargetAccel() {
@@ -63,16 +66,21 @@ public class DynamicParams {
 
     public void startCalibration() {
         accelMult = accelMultCal.getGuess();
-        coastMult = coastMultCal.getGuess();
+        cruiseMult = cruiseMultCal.getGuess();
     }
 
     public void finishCalibration() {
         accelMultCal.updateGuess(aMeter.getAccel());
-        coastMultCal.updateGuess(cMeter.getAccel());
+        cruiseMultCal.updateGuess(cMeter.getAccel());
         targetDeccel = dMeter.getAccel();
     }
 
     public double getMaxSpeed() {
         return maxSpeed;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("amult=%f, cmult=%f, dec=%f", accelMult, cruiseMult, targetDeccel);
     }
 }

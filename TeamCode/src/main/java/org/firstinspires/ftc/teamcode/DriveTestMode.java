@@ -28,9 +28,10 @@ public class DriveTestMode extends LinearOpMode {
         DynamicParams adp = md.getActiveDynamicParams();
         adp.startCalibration();
 
-        telemetry.addData("DP", adp);
+        md.addTelemetry();
         telemetry.addData("pos", "target=%.1f", targetPos);
         telemetry.update();
+        sleep(5000);
 
         while (opModeIsActive()) {
             boolean done = md.runDrive(false);
@@ -41,7 +42,7 @@ public class DriveTestMode extends LinearOpMode {
 
         adp.finishCalibration();
 
-        telemetry.addData("DP", adp);
+        md.addTelemetry();
         telemetry.addData("pos", "target=%.1f, actual=%.1f", targetPos, actualPos);
         telemetry.update();
         sleep(5000);
