@@ -17,7 +17,7 @@ public class MintDrive {
 
     //for 20:1
     private static final double shutdownTol = 30;
-    private static final MoveCal driveCal = new MoveCal(15, 900, -930, 300);
+    private static final MoveCal driveCal = new MoveCal(15, 900, -500, 300);
     private static final MoveCal strafeCal = new MoveCal(15, 571, -1200, 300);
     private static final double[] accelVolts = new double[]{0.9619 * 0.25, 0.9748 * 0.25, 1.0273 * 0.25, 1.0405 * 0.25};
 
