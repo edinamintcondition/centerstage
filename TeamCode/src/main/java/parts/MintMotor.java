@@ -53,7 +53,7 @@ public class MintMotor {
         speedo.sample(getDeg());
     }
 
-    public void run(double currBotSpeed, double dir) {
+    public void run(double currBotSpeed, double move, double dir) {
         if (!driving) {
             if (currBotSpeed < coastToStopTol) {
                 torqueFrac = 0;
@@ -66,8 +66,8 @@ public class MintMotor {
             torqueFrac = accelTorqueFrac;
         }
 
-        torqueFrac *= dir;
-        currBotSpeed *= dir;
+        torqueFrac *= move * dir;
+        currBotSpeed *= move;
 
         double volt = (torqueFrac + currBotSpeed / motorConf.topSpeed) * motorConf.nominalVolt;
         motor.setPower(volt / vs.getVoltage());

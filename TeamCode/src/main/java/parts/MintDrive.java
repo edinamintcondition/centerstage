@@ -123,7 +123,7 @@ public class MintDrive {
             setDriving(true);
 
         for (int i = 0; i < 4; i++)
-            get(i).run(s, move[i] * dir);
+            get(i).run(s, move[i], dir);
 
         return false;
     }
