@@ -27,7 +27,7 @@ public class DriveTestMode extends LinearOpMode {
 
         telemetry.addData("pos", "target=%.1f", targetDist);
         telemetry.update();
-        sleep(5000);
+        sleep(500);
 
         while (opModeIsActive()) {
             boolean done = md.run();

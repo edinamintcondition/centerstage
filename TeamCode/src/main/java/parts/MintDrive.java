@@ -3,6 +3,8 @@ package parts;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -11,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.Arrays;
 
+@SuppressLint("DefaultLocale")
 public class MintDrive {
     private final MintMotor[] mCon;
 
@@ -85,16 +88,6 @@ public class MintDrive {
             get(i).resetDeg();
     }
 
-    public double getDeg(boolean strafe) {
-        int s = 1;
-        if (strafe) s = -1;
-
-        double[] d = new double[]{get(0).getDeg(), s * get(1).getDeg(), s * get(2).getDeg(), get(3).getDeg()};
-
-        Arrays.sort(d);
-        return (d[1] + d[2]) / 2;
-    }
-
 //    public double getPos(boolean strafe) {
 //        double deg = getDeg(strafe);
 //        return deg / aDP.getDpi();
@@ -166,7 +159,7 @@ public class MintDrive {
     public double getSpeed() {
         double[] d = new double[4];
         for (int i = 0; i < 4; i++)
-            d[i] = get(1).getSpeed() * move[i]; // mult/divide?
+            d[i] = get(i).getSpeed() * move[i]; // mult/divide?
 
         Arrays.sort(d);
         return (d[1] + d[2]) / 2;
@@ -175,7 +168,7 @@ public class MintDrive {
     public double getDeg() {
         double[] d = new double[4];
         for (int i = 0; i < 4; i++)
-            d[i] = get(1).getDeg() * move[i]; // mult/divide?
+            d[i] = get(i).getDeg() * move[i]; // mult/divide?
 
         Arrays.sort(d);
         return (d[1] + d[2]) / 2;
@@ -184,6 +177,11 @@ public class MintDrive {
     public double getPos() {
         double deg = getDeg();
         return deg / amc.dpi;
+    }
+
+    public String moveString() {
+        return String.format("tgtDeg: %f, dir: %f, move: %f, %f, %f, %f",
+                tgtDeg, dir, move[0], move[1], move[2], move[3]);
     }
 
     public void preRun(double targetPos, boolean strafe) {
@@ -202,6 +200,7 @@ public class MintDrive {
     public boolean run() {
         for (int i = 0; i < 4; i++)
             get(i).sample();
+
         double s = getSpeed();
         double d = getDeg();
 
@@ -212,13 +211,15 @@ public class MintDrive {
 
         double tgtSpeed;
         double cutoff = tgtDeg + 0.5 * dir * s * s / amc.deccel;
-        if (d * dir >= cutoff * dir) tgtSpeed = 0;
-        else tgtSpeed = dir * amc.maxSpeed;
+        if (d * dir >= cutoff * dir)
+            tgtSpeed = 0;
+        else
+            tgtSpeed = dir * amc.maxSpeed;
 
         setTargetSpeed(tgtSpeed);
 
         for (int i = 0; i < 4; i++)
-            get(0).run(s * move[i]);
+            get(i).run(s * move[i]);
 
         return false;
     }
