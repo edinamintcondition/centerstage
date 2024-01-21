@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.Speedometer;
 
 @SuppressLint("DefaultLocale")
 public class MintMotor {
-    private static final double NOMINAL_VOLTS = 12;
     private final DcMotor motor;
     private final VoltageSensor vs;
     private final MotorConfig motorConf;
@@ -23,7 +22,6 @@ public class MintMotor {
     private double torqueFrac, prevTorqueFrac;
     private double currTime, prevTime;
     private static final double speedTol = 20;
-    private static final double stopTol = 30;
     private static final double coastToStopTol = 90;
     private final double torqueRamp;
     private boolean cruising;
@@ -40,20 +38,12 @@ public class MintMotor {
         t = new ElapsedTime();
     }
 
-    public DcMotor getMotor() {
-        return motor;
-    }
-
     public double getDeg() {
         return motorConf.toDeg(motor.getCurrentPosition() - initPos);
     }
 
     public double getSpeed() {
         return speedo.getSpeed();
-    }
-
-    public boolean isStopped() {
-        return Math.abs(getSpeed()) < stopTol;
     }
 
     public void setTargetSpeed(double t) {

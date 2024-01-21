@@ -11,7 +11,7 @@ public class DriveTestMode extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        md = new MintDrive(hardwareMap, telemetry);
+        md = new MintDrive(hardwareMap);
         waitForStart();
 
         int dir = 1;
