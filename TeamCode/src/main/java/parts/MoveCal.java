@@ -1,13 +1,11 @@
 package parts;
 
 public class MoveCal {
-    public final double dpi, accel, maxSpeed;
+    public final double dpi;
     public double deccel;
 
-    public MoveCal(double dpi, double accel, double deccel, double maxSpeed) {
+    public MoveCal(double dpi, double deccel) {
         this.dpi = dpi;
-        this.accel = accel;
         this.deccel = deccel;
-        this.maxSpeed = maxSpeed;
     }
 }
