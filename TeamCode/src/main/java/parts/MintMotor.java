@@ -75,23 +75,6 @@ public class MintMotor {
         currTime = t.seconds();
     }
 
-    public void run(double speed, double accelTgt, double degTgt, double dir, DynamicParams p) {
-        double coast = accelTgt == 0 ? 1 : 0;
-
-        speed *= dir;
-        accelTgt *= dir;
-        degTgt *= dir;
-        coast *= dir;
-
-        double degErr = degTgt - getDeg();
-
-        double torqueFrac = p.getAccelMult() * accelTgt
-                + p.getErrMult() * degErr
-                + p.getCruiseMult() * coast;
-        double volt = (torqueFrac + speed / p.getMaxSpeed()) * NOMINAL_VOLTS;
-        motor.setPower(volt / vs.getVoltage());
-    }
-
     public void run(double speed) {
         if (targetSpeed == 0) {
             if (Math.abs(speed) < coastToStopTol) {
