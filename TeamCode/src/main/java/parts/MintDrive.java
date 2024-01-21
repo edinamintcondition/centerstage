@@ -9,8 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 import java.util.Arrays;
 
 @SuppressLint("DefaultLocale")
@@ -21,8 +19,6 @@ public class MintDrive {
     private static final MoveCal driveCal = new MoveCal(15, 900, -930, 300);
     private static final MoveCal strafeCal = new MoveCal(15, 571, -1200, 300);
     private static final double[] accelVolts = new double[]{0.9619 * 0.25, 0.9748 * 0.25, 1.0273 * 0.25, 1.0405 * 0.25};
-    private static final double[] cruiseVolts = new double[]{0.9619 * 0.18, 0.9748 * 0.18, 1.0273 * 0.18, 1.0405 * 0.18};
-    private static final double torqueRampTime = 0.2;
 
     private double[] move;
     private MoveCal amc;
@@ -44,10 +40,8 @@ public class MintDrive {
             else motors[i].setDirection(REVERSE);
 
             double accelTf = accelVolts[i];
-            double coastTf = cruiseVolts[i];
-            double torqueRamp = accelTf / torqueRampTime;
 
-            mCon[i] = new MintMotor(motors[i], MotorConfig.driveMotor, vs, accelTf, coastTf, torqueRamp);
+            mCon[i] = new MintMotor(motors[i], MotorConfig.driveMotor, vs, accelTf);
         }
     }
 

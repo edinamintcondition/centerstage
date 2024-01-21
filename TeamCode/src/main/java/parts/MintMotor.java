@@ -16,24 +16,18 @@ public class MintMotor {
     private final VoltageSensor vs;
     private final MotorConfig motorConf;
     private final double accelTorqueFrac;
-    private final double cruiseTorqueFrac;
     private final Speedometer speedo;
     private double targetSpeed, initPos;
-    private double torqueFrac, prevTorqueFrac;
-    private double currTime, prevTime;
-    private static final double speedTol = 20;
+    private double torqueFrac;
+    private double currTime;
     private static final double coastToStopTol = 90;
-    private final double torqueRamp;
-    private boolean cruising;
     private final ElapsedTime t;
 
-    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf, double cruiseTf, double torqueRamp) {
+    public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf) {
         this.motor = motor;
         this.vs = vs;
         this.motorConf = motorConf;
         this.accelTorqueFrac = accelTf;
-        this.cruiseTorqueFrac = cruiseTf;
-        this.torqueRamp = torqueRamp;
         speedo = new Speedometer(8);
         t = new ElapsedTime();
     }
@@ -47,10 +41,7 @@ public class MintMotor {
     }
 
     public void setTargetSpeed(double t) {
-        if (t != targetSpeed) {
-            targetSpeed = t;
-            cruising = false;
-        }
+        targetSpeed = t;
     }
 
     public void resetDeg() {
@@ -60,8 +51,6 @@ public class MintMotor {
 
     public void sample() {
         speedo.sample(getDeg());
-        prevTorqueFrac = torqueFrac;
-        prevTime = currTime;
         currTime = t.seconds();
     }
 
@@ -71,31 +60,12 @@ public class MintMotor {
                 torqueFrac = 0;
                 motor.setPower(0);
                 return;
+            } else {
+                torqueFrac = -accelTorqueFrac;
             }
-        }
-
-        double minTf, maxTf;
-        if (cruising) {
-            double deltaTime = currTime - prevTime;
-            minTf = prevTorqueFrac - torqueRamp * deltaTime;
-            maxTf = prevTorqueFrac + torqueRamp * deltaTime;
         } else {
-            minTf = -1;
-            maxTf = 1;
-        }
-
-        if (Math.abs(speed - targetSpeed) < speedTol) {
-            int dir = targetSpeed < 0 ? -1 : 1;
-            torqueFrac = dir * cruiseTorqueFrac;
-            cruising = true;
-        } else if (speed < targetSpeed) {
             torqueFrac = accelTorqueFrac;
-        } else {
-            torqueFrac = -accelTorqueFrac;
         }
-
-        if (torqueFrac < minTf) torqueFrac = minTf;
-        if (torqueFrac > maxTf) torqueFrac = maxTf;
 
         double volt = (torqueFrac + speed / motorConf.topSpeed) * motorConf.nominalVolt;
         motor.setPower(volt / vs.getVoltage());
@@ -104,7 +74,7 @@ public class MintMotor {
     @NonNull
     @Override
     public String toString() {
-        return String.format("tgt spd=%.2f, spd=%.2f, trq=%.2f, pwr=%.2f, %s", targetSpeed, getSpeed(), torqueFrac, motor.getPower(),
-                cruising ? "c" : "a");
+        return String.format("tgt spd=%.2f, spd=%.2f, trq=%.2f, pwr=%.2f",
+                targetSpeed, getSpeed(), torqueFrac, motor.getPower());
     }
 }
