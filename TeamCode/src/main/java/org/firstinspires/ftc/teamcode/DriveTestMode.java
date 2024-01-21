@@ -16,7 +16,7 @@ public class DriveTestMode extends LinearOpMode {
 
         int dir = 1;
         for (int trial = 0; trial < 6; trial++) {
-            test(60 * dir, false);
+            test(20 * dir, false);
             dir = -dir;
         }
     }

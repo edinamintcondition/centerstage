@@ -19,9 +19,9 @@ public class MintMotor {
     private final Speedometer speedo;
     private double targetSpeed, initPos;
     private double torqueFrac;
-    private double currTime;
-    private static final double coastToStopTol = 90;
+    private static final double coastToStopTol = 30;
     private final ElapsedTime t;
+    private boolean driving;
 
     public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf) {
         this.motor = motor;
@@ -40,8 +40,8 @@ public class MintMotor {
         return speedo.getSpeed();
     }
 
-    public void setTargetSpeed(double t) {
-        targetSpeed = t;
+    public void setDriving(boolean t) {
+        driving = t;
     }
 
     public void resetDeg() {
@@ -51,12 +51,11 @@ public class MintMotor {
 
     public void sample() {
         speedo.sample(getDeg());
-        currTime = t.seconds();
     }
 
-    public void run(double speed) {
-        if (targetSpeed == 0) {
-            if (Math.abs(speed) < coastToStopTol) {
+    public void run(double currSpeed, double dir) {
+        if (!driving) {
+            if (currSpeed < coastToStopTol) {
                 torqueFrac = 0;
                 motor.setPower(0);
                 return;
@@ -67,14 +66,20 @@ public class MintMotor {
             torqueFrac = accelTorqueFrac;
         }
 
-        double volt = (torqueFrac + speed / motorConf.topSpeed) * motorConf.nominalVolt;
+        torqueFrac *= dir;
+
+        double volt = (torqueFrac + currSpeed / motorConf.topSpeed) * motorConf.nominalVolt;
         motor.setPower(volt / vs.getVoltage());
+    }
+
+    public void shutdown() {
+        motor.setPower(0);
     }
 
     @NonNull
     @Override
     public String toString() {
-        return String.format("tgt spd=%.2f, spd=%.2f, trq=%.2f, pwr=%.2f",
-                targetSpeed, getSpeed(), torqueFrac, motor.getPower());
+        return String.format("spd=%.2f, trq=%.2f, pwr=%.2f",
+                getSpeed(), torqueFrac, motor.getPower());
     }
 }

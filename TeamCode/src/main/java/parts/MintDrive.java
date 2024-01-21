@@ -16,6 +16,7 @@ public class MintDrive {
     private final MintMotor[] mCon;
 
     //for 20:1
+    private static final double shutdownTol = 30;
     private static final MoveCal driveCal = new MoveCal(15, 900, -930, 300);
     private static final MoveCal strafeCal = new MoveCal(15, 571, -1200, 300);
     private static final double[] accelVolts = new double[]{0.9619 * 0.25, 0.9748 * 0.25, 1.0273 * 0.25, 1.0405 * 0.25};
@@ -103,28 +104,34 @@ public class MintDrive {
         double d = getDeg();
 
         if (d * dir >= tgtDeg * dir) {
-            setTargetSpeed(0);
-            return true;
+            setDriving(false);
+
+            if (s * dir <= shutdownTol) {
+                shutdown();
+                return true;
+            }
         }
 
-        double tgtSpeed;
         double cutoff = tgtDeg + 0.5 * dir * s * s / amc.deccel;
         if (d * dir >= cutoff * dir)
-            tgtSpeed = 0;
+            setDriving(false);
         else
-            tgtSpeed = dir * amc.maxSpeed;
-
-        setTargetSpeed(tgtSpeed);
+            setDriving(true);
 
         for (int i = 0; i < 4; i++)
-            get(i).run(s * move[i]);
+            get(i).run(s, move[i] * dir);
 
         return false;
     }
 
-    private void setTargetSpeed(double t) {
+    private void setDriving(boolean t) {
         for (int i = 0; i < 4; i++)
-            get(i).setTargetSpeed(t * move[i]);
+            get(i).setDriving(t);
+    }
+
+    private void shutdown() {
+        for (int i = 0; i < 4; i++)
+            get(i).shutdown();
     }
 
     private static VoltageSensor getVs(HardwareMap hardwareMap) {
