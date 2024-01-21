@@ -21,13 +21,16 @@ public class DriveTestMode extends LinearOpMode {
         waitForStart();
 
         test(40);
-        sleep(10000);
+        sleep(1000);
         test(-40);
 
         Calibrator cal = new Calibrator(20.5, md.getActiveMoveCal().deccel);
 
         for (int trial = 0; trial < 10; trial++) {
             md.getActiveMoveCal().deccel = cal.getGuess();
+            if (md.getActiveMoveCal().deccel >= 0)
+                break;
+
             test(20);
             cal.updateGuess(md.getPos());
             sleep(2000);
@@ -40,8 +43,8 @@ public class DriveTestMode extends LinearOpMode {
         md.resetPos();
         md.preRun(targetDist, strafe);
 
-        telemetry.addData("pos", "target=%.1f", targetDist);
         telemetry.addData("deccel", "deccel=%.1f", md.getActiveMoveCal().deccel);
+        telemetry.addData("pos", "target=%.1f", targetDist);
         telemetry.update();
         sleep(500);
 
@@ -54,9 +57,8 @@ public class DriveTestMode extends LinearOpMode {
         double actualDeg = md.getDeg();
 
         telemetry.addData("deccel", "deccel=%.1f", md.getActiveMoveCal().deccel);
-        telemetry.addData("pos", "target=%.1f, actual=%.1f, actualDeg=%.1f",
-                targetDist, actualPos, actualDeg);
+        telemetry.addData("pos", "target=%.1f, actual=%.1f, actualDeg=%.1f", targetDist, actualPos, actualDeg);
         telemetry.update();
-        sleep(5000);
+        sleep(500);
     }
 }
