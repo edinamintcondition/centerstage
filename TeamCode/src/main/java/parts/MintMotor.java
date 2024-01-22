@@ -17,10 +17,9 @@ public class MintMotor {
     private final MotorConfig motorConf;
     private final double accelTorqueFrac;
     private final Speedometer speedo;
-    private double targetSpeed, initPos;
+    private double initPos;
     private double torqueFrac;
     private static final double coastToStopTol = 30;
-    private final ElapsedTime t;
     private boolean driving;
 
     public MintMotor(DcMotor motor, MotorConfig motorConf, VoltageSensor vs, double accelTf) {
@@ -29,7 +28,6 @@ public class MintMotor {
         this.motorConf = motorConf;
         this.accelTorqueFrac = accelTf;
         speedo = new Speedometer(8);
-        t = new ElapsedTime();
     }
 
     public double getDeg() {

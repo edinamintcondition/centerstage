@@ -4,17 +4,21 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import parts.Calibrator;
+import parts.DriveDirection;
 import parts.MintDrive;
 import parts.MoveCal;
 
 @Autonomous
 public class DriveTestMode extends LinearOpMode {
+    public DriveTestMode() {
+        dir = DriveDirection.Axial;
+    }
+
     private MintDrive md;
 
-    protected boolean strafe;
+    protected DriveDirection dir;
 
-
-    // how to do dpi calibration: ...
+    // how to do dpi calibration: drive, read actualDeg from Driver Station, measure distance with tape measure,divide actualDeg by measured distance
     @Override
     public void runOpMode() {
         md = new MintDrive(hardwareMap);
@@ -41,7 +45,7 @@ public class DriveTestMode extends LinearOpMode {
 
     private void test(double targetDist) {
         md.resetPos();
-        md.preRun(targetDist, strafe);
+        md.preRun(targetDist, dir);
 
         telemetry.addData("deccel", "deccel=%.1f", md.getActiveMoveCal().deccel);
         telemetry.addData("pos", "target=%.1f", targetDist);

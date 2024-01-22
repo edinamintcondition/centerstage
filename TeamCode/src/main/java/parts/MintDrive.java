@@ -19,6 +19,7 @@ public class MintDrive {
     private static final double shutdownTol = 30;
     private static final MoveCal driveCal = new MoveCal(566.5 / 38.5, -500);
     private static final MoveCal strafeCal = new MoveCal(749.0 / 40.5, -1200);
+    private static final MoveCal diagCal = new MoveCal(749.0 / 40.5, -1200);
     private static final double[] accelVolts = new double[]{0.9619 * 0.25, 0.9748 * 0.25, 1.0273 * 0.25, 1.0405 * 0.25};
 
     private double[] move;
@@ -87,13 +88,21 @@ public class MintDrive {
                 tgtDeg, dir, move[0], move[1], move[2], move[3]);
     }
 
-    public void preRun(double targetPos, boolean strafe) {
-        if (strafe) {
+    public void preRun(double targetPos, DriveDirection d) {
+        if (d == DriveDirection.Lateral) {
             move = new double[]{1, -1, -1, 1};
             amc = strafeCal;
-        } else {
+        } else if (d == DriveDirection.Axial) {
             move = new double[]{1, 1, 1, 1};
             amc = driveCal;
+        } else if (d == DriveDirection.Diagonal) {
+            move = new double[]{1, 0, 0, 1};
+            amc = diagCal;
+        } else if (d == DriveDirection.CrossDiagonal) {
+            move = new double[]{0, 1, 1, 0};
+            amc = diagCal;
+        } else {
+            throw new RuntimeException("unknown direction");
         }
 
         tgtDeg = amc.dpi * targetPos;

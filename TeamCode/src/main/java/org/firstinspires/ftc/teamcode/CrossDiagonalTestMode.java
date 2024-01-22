@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import parts.DriveDirection;
 
 @Autonomous
-public class StrafeTestMode extends DriveTestMode{
-    public StrafeTestMode() {
-        dir = DriveDirection.Lateral;
+public class CrossDiagonalTestMode extends DriveTestMode {
+    public CrossDiagonalTestMode() {
+        dir = DriveDirection.CrossDiagonal;
     }
 }
