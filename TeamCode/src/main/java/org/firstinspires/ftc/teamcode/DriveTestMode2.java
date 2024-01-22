@@ -18,7 +18,7 @@ public class DriveTestMode2 extends LinearOpMode {
         md.resetPos();
         md.preRun(20, DriveDirection.Diagonal);
         while (opModeIsActive()) {
-            telemetry.addData("drive", "speed=$.1f", md.getSpeed());
+            telemetry.addData("drive", "speed=%.1f", md.getSpeed());
             for (int i = 0; i < 4; i++)
                 telemetry.addData("motor", "%d %s", i, md.get(i));
             telemetry.update();

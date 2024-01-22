@@ -52,23 +52,30 @@ public class MintMotor {
     }
 
     public void run(double currBotSpeed, double move, double dir) {
-        if (!driving) {
-            if (currBotSpeed < coastToStopTol) {
-                torqueFrac = 0;
-                motor.setPower(0);
-                return;
+        if (move != 0) {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+            if (!driving) {
+                if (currBotSpeed < coastToStopTol) {
+                    torqueFrac = 0;
+                    motor.setPower(0);
+                    return;
+                } else {
+                    torqueFrac = -accelTorqueFrac;
+                }
             } else {
-                torqueFrac = -accelTorqueFrac;
+                torqueFrac = accelTorqueFrac;
             }
+
+            torqueFrac *= move * dir;
+            currBotSpeed *= move;
+
+            double volt = (torqueFrac + currBotSpeed / motorConf.topSpeed) * motorConf.nominalVolt;
+            motor.setPower(volt / vs.getVoltage());
         } else {
-            torqueFrac = accelTorqueFrac;
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            motor.setPower(0);
         }
-
-        torqueFrac *= move * dir;
-        currBotSpeed *= move;
-
-        double volt = (torqueFrac + currBotSpeed / motorConf.topSpeed) * motorConf.nominalVolt;
-        motor.setPower(volt / vs.getVoltage());
     }
 
     public void shutdown() {
