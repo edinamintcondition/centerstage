@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import parts.MintDrive;
 
+@Disabled
 @Autonomous
 @SuppressLint("DefaultLocale")
 public class MotorCalMode extends LinearOpMode {

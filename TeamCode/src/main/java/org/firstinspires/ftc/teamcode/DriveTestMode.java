@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import parts.MintDrive;
 
 @Autonomous
+@Disabled
 public class DriveTestMode extends LinearOpMode {
     /*Set ERR_MULT and DRAG_MULT = 0, and calibrate.
     Grab pos at end of acceleration, and compare to degreeStopAccel
