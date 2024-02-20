@@ -98,32 +98,30 @@ public class MintWheels {
         telemetry.addData(">", name + " motor: ", tgtPower);
     }
 
-    public void setNavigation() {
-    }
 
-    public void runAny(double axial, double lateral, double yaw, double powerLimit) {
-        double max;
-
-        double leftFrontPower = axial + lateral - yaw;
-        double leftBackPower = axial - lateral - yaw;
-        double rightFrontPower = axial - lateral + yaw;
-        double rightBackPower = axial + lateral + yaw;
-
-        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > powerLimit) {
-            leftFrontPower *= powerLimit / max;
-            rightFrontPower *= powerLimit / max;
-            leftBackPower *= powerLimit / max;
-            rightBackPower *= powerLimit / max;
-        }
-
-        //Applies the power to the motors
-        leftFront.setPower(leftFrontPower);
-        leftBack.setPower(leftBackPower);
-        rightFront.setPower(rightFrontPower);
-        rightBack.setPower(rightBackPower);
-    }
+//    public void runAny(double axial, double lateral, double yaw, double powerLimit) {
+//        double max;
+//
+//        double leftFrontPower = axial + lateral - yaw;
+//        double leftBackPower = axial - lateral - yaw;
+//        double rightFrontPower = axial - lateral + yaw;
+//        double rightBackPower = axial + lateral + yaw;
+//
+//        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+//        max = Math.max(max, Math.abs(leftBackPower));
+//        max = Math.max(max, Math.abs(rightBackPower));
+//
+//        if (max > powerLimit) {
+//            leftFrontPower *= powerLimit / max;
+//            rightFrontPower *= powerLimit / max;
+//            leftBackPower *= powerLimit / max;
+//            rightBackPower *= powerLimit / max;
+//        }
+//
+//        //Applies the power to the motors
+////        leftFront.setPower(leftFrontPower);
+////        leftBack.setPower(leftBackPower);
+//        rightFront.setPower(rightFrontPower);
+////        rightBack.setPower(rightBackPower);
+//    }
 }
