@@ -10,10 +10,11 @@ public class MintWrist {
 
     // Constants
     String servoName = "wrist_servo";
-    public static final double DROP_POSITION = 0.7;
-    public static final double RETRACTED_POS = 0.425;
-    public static final double FLAT_POSITION = 0.58;
-    public static final double HANG_POSITION = 0.8;
+    public static final double DROP_POSITION = 0.58;
+    public static final double RETRACTED_POS = 0.3;
+    public static final double FLAT_POSITION = 0.45;
+    public static final double EXTENDED_POS = 0.695;
+    double wristPosition = 0.0;
 
     // Variables
     Gamepad gamepad;
@@ -39,7 +40,7 @@ public class MintWrist {
         if (gamepad.a) {
             grabber.closeGrabLR();
             pressedButton = "'a'";
-            positionTwo(); // fully extend
+            positionTwo(); // pixel drop pos
         } else if (gamepad.b) {
             grabber.closeGrabLR();
             pressedButton = "'b'";
@@ -50,7 +51,15 @@ public class MintWrist {
             positionOne(); // extend until flat with the ground
         } else if (gamepad.y) {
             pressedButton = "'y'";
-            positionThree();
+            positionThree(); // fully extends
+        }
+
+        wristPosition = wristPosition + (-gamepad.right_stick_y / 10);
+
+        myServo.setPosition(wristPosition);
+
+        if (gamepad.right_stick_y > 0 || gamepad.right_stick_y < 0) {
+            telemetry.addData(">", "wrist fine tune being used");
         }
 
         telemetry.addData(">", pressedButton + " is pressed :D");
@@ -59,23 +68,23 @@ public class MintWrist {
 
 
     public void positionZero() {
-        myServo.setPosition(RETRACTED_POS); // retracts
+        wristPosition = RETRACTED_POS; // retracts
         telemetry.addData(">","retracted");
     }
 
     public void positionOne() {
-        myServo.setPosition(DROP_POSITION); // extends
+        wristPosition = FLAT_POSITION; // Is parallel to the floor when are is fully down
         telemetry.addData(">","wrist flat!");
     }
 
     public void positionTwo() {
-        myServo.setPosition(FLAT_POSITION); // Is parallel to the floor when are is fully down
+        wristPosition = DROP_POSITION; // gets wrist at 30 degrees
         telemetry.addData(">","pixel drop pos!");
     }
 
     public void positionThree() {
-        myServo.setPosition(HANG_POSITION); // for hanging
-        telemetry.addData(">","hanging ready");
+        wristPosition = EXTENDED_POS; // fully extends
+        telemetry.addData(">","i'm all out");
     }
 
     public void positionTea() {}
