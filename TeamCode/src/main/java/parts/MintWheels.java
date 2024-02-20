@@ -55,10 +55,10 @@ public class MintWheels {
         double yaw = gamepad.right_stick_x;
 
         //Calculates the wheel direction
-        double leftFrontPower = axial + lateral + yaw;
-        double leftBackPower = axial - lateral + yaw;
-        double rightFrontPower = axial - lateral - yaw;
-        double rightBackPower = axial + lateral - yaw;
+        double leftFrontPower = axial + lateral + (yaw * 5);
+        double leftBackPower = axial - lateral + (yaw * 5);
+        double rightFrontPower = -axial + lateral + (yaw * 5);
+        double rightBackPower = axial + lateral - (yaw * 5);
 
         double max = max(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
         double min = min(asList(leftFrontPower, rightFrontPower, leftBackPower, rightBackPower));
@@ -74,7 +74,7 @@ public class MintWheels {
             telemetry.addData(">", "SLOOOW DOWN MATE");
         } else {
             forwardPowerLimit = 0.45;
-            backwardPowerLimit = -0.6;
+            backwardPowerLimit = -0.45;
             telemetry.addData(">", "normal speed :b");
         }
 
