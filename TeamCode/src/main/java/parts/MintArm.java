@@ -14,7 +14,7 @@ public class MintArm {
 
     // Constants
     String motorName = "arm_motor";
-    //Sets power to 40%
+    //Sets power to 50%
     double normPower = 0.5;
 
     // Variables
@@ -51,14 +51,20 @@ public class MintArm {
 
         } else {
 
-        double armPower = gamepad.left_stick_y * normPower;
-        telemetry.addData(">", "normal arm power D':");
+            double armPower = 0.0;
 
-        // move motor
-        armMotor.setPower(armPower);
+            if (gamepad.left_stick_y >= 0) {
+                armPower = gamepad.left_stick_y * normPower;
+                armMotor.setPower(armPower);
+            } else if (gamepad.left_stick_y < 0) {
+                armPower = (gamepad.left_stick_y - 0.5) * normPower;
+                armMotor.setPower(armPower);
+            }
 
-        telemetry.addData("Arm " + armMotor.getDeviceName(), "%f %d", armPower, armMotor.getCurrentPosition());
+            telemetry.addData(">", "normal arm power D':");
+
+            telemetry.addData("Arm " + armMotor.getDeviceName(), "%f %d", armPower, armMotor.getCurrentPosition());
         }
     }
-
 }
+
